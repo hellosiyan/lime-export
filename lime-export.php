@@ -39,8 +39,8 @@ function wple_admin_init() {
 		try {
 			wple_do_export();
 		} catch (WPLE_Exception $e) {
-			wp_redirect( add_query_arg('message', $e->getErrNum()) );
-			exit();
+			$_GET['message'] = $e->getErrNum();
+			// wp_redirect( add_query_arg('message', $e->getErrNum()) );
 		}
 	}
 
@@ -52,6 +52,12 @@ function wple_admin_page() {
 	global $wpdb;
 
 	$tables = wple_get_existing_tables();
+	$core_tables = array_merge($wpdb->tables, $wpdb->global_tables, $wpdb->ms_global_tables);
+	$formats = array(
+		'both' => __('Structure and Data'),
+		'structure' => __('Structure'),
+		'data' => __('Data'),
+	);
 
 	include(WPLE_PATH . '/export-page.php');
 }
@@ -63,9 +69,21 @@ function wple_do_export() {
 		throw new WPLE_Exception( WPLE_MSG_NO_SELECTION );
 	}
 
-	$filename = $wpdb->dbname . '.' . date('Y-m-d') . '.sql';
+	$config = wple_export_config();
+
+	$filename = preg_replace(array('~@host@~i', '~@database@~i', '~@date@~i'), array($wpdb->dbhost, $wpdb->dbname, date('Y-m-d')), $config['file_name']) . '.sql';
 	$export_tables = $_POST['wple_export_tables'];
 	$existing_tables = wple_get_existing_tables();
+
+	foreach ($export_tables as $index => $table_al) {
+		if ( !in_array($wpdb->prefix . $table_al, $existing_tables) ) {
+			array_splice($export_tables, $index, 1);
+		}
+	}
+
+	if ( empty($export_tables) ) {
+		throw new WPLE_Exception( WPLE_MSG_NO_SELECTION );
+	}
 
 	$wple_export_file = tmpfile();
 	$wple_time_start = time();
@@ -91,15 +109,18 @@ function wple_do_export() {
 	wple_output_handler($head);
 	foreach ($export_tables as $table_al) {
 		$table = $wpdb->prefix . $table_al;
-		if ( !in_array($table, $existing_tables) ) {
-			continue;
-		}
 
 		$query = 'SELECT * FROM `' . $table . '` ';
 
 		wple_output_handler($table_separator);
-		wple_export_structure($table);
-		wple_export_data($table, $query);
+
+		if ( $config['format'] == 'both' || $config['format'] == 'structure' ) {
+			wple_export_structure($table, $config);
+		}
+
+		if ( $config['format'] == 'both' || $config['format'] == 'data' ) {
+			wple_export_data($table, $query, $config);
+		}
 	}
 
 	$wpdb->query('SET time_zone = "' . $old_tz . '"');
@@ -125,11 +146,15 @@ function wple_do_export() {
 	exit();
 }
 
-function wple_export_structure($table) {
+function wple_export_structure($table, $config) {
 	global $wpdb;
 
 	$schema_create = wple_export_comment( __('Table structure for table') . ' ' . $table) . "\n";
     $auto_increment = '';
+
+    if ( $config['add_drop_table'] ) {
+    	$schema_create .= "DROP TABLE IF EXISTS `" . $table . "`;\n";
+    }
 
     // Table status
     $result = mysql_query('SHOW TABLE STATUS FROM `' . $wpdb->dbname . '` LIKE \'' . wple_addslashes($table) . '\'', $wpdb->dbh);
@@ -175,7 +200,7 @@ function wple_export_structure($table) {
     mysql_free_result($result);
 }
 
-function wple_export_data($table, $sql_query) {
+function wple_export_data($table, $sql_query, $config) {
 	global $wpdb;
 	$i = 0; 
 	$j = 0;
@@ -278,3 +303,35 @@ function wple_export_comment( $text ) {
 	return (empty($text) ? '' : "--\n-- ") . $text . "\n--\n";
 }
 
+function wple_export_config() {
+	$preset = isset( $_POST['wple_preset'] ) ? $_POST['wple_preset']: 'standard';
+
+	$config = array(
+		'file_name' => '@DATABASE@.@DATE@',
+		'format' => 'both',
+		'add_drop_table' => false,
+	);
+
+	if ( $preset != 'custom' ) {
+		return $config;
+	}
+
+	if ( isset($_POST['wple_dump_name']) ) {
+		$config['file_name'] = preg_replace(array('~[^\w\d.@\-_]~'), array(''), $_POST['wple_dump_name']);
+		if ( empty($config['file_name']) ) {
+			$config['file_name'] = '@DATABASE@.@DATE@';
+		}
+	}
+
+	if ( isset($_POST['wple_dump_format']) ) {
+		$config['format'] = in_array( $_POST['wple_dump_format'], array('both', 'structure', 'data') ) ? $_POST['wple_dump_format']: 'both';
+	}
+
+	if ( isset($_POST['wple_dump_add_drop']) ) {
+		$config['add_drop_table'] = true;
+	} else {
+		$config['add_drop_table'] = false;
+	}
+
+	return $config;
+}

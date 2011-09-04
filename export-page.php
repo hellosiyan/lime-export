@@ -21,21 +21,53 @@
 
 	?>
 
-	<h3><?php echo __('Choose which tables to export') ?></h3>
 	<form action="" method="post" id="export-filters">
 		<?php wp_nonce_field('wple_download','wple_download'); ?>
+	
+		<p>
+			<label><input type="radio" name="wple_preset" value="standard" <?php echo wple_get_checked('wple_preset', 'checked="checked"', 'standard') ?> /> <?php echo __('Standard export'); ?></label>
+			<span class="description"><?php echo __('structure and data, no <code>DROP TABLE</code> statement'); ?></span>
+		</p>
+		<p>
+			<label><input type="radio" name="wple_preset" value="custom" <?php echo wple_get_checked('wple_preset', '', 'custom') ?> /> <?php echo __('Custom settings'); ?></label>
+		</p>
 
-		<ul>
+		<ul class="export-settings">
+			<li>
+				<label><?php echo __('File name template'); ?>:</label>
+				<input type="text" name="wple_dump_name" value="<?php echo wple_get_postval('wple_dump_name', '@DATABASE@.@DATE@') ?>" size="30" />
+			</li>
+			<li>
+				<label><?php echo __('Include table'); ?>:</label>
+				<select name="wple_dump_format">
+					<?php 
+					$current_format = wple_get_postval('wple_dump_format', 'both');
+					foreach ($formats as $format => $label): ?>
+						<option value="<?php echo $format ?>" <?php if($current_format==$format) echo 'selected="selected"'; ?>><?php echo $label; ?></option>
+					<?php endforeach ?>
+				</select>
+			</li>
+			<li>
+				<label><?php echo __('Add <code>DROP TABLE</code> statement'); ?>:</label>
+				<input type="checkbox" name="wple_dump_add_drop" value="1" <?php echo wple_get_checked('wple_dump_add_drop') ?>/>
+			</li>
+		</ul>
+
+
+		<h3><?php echo __('Choose which tables to export') ?></h3>
+		<ul class="tables-list">
 			<?php foreach ($tables as $table): 
 				$table = preg_replace('~^' . preg_quote($wpdb->prefix) . '~', '', $table);
-				$checked = in_array($table, $wpdb->tables) || in_array($table, $wpdb->global_tables) || in_array($table, $wpdb->ms_global_tables);
+				$checked = in_array($table, $core_tables) ? 'checked="checked"': '';
+				$checked = wple_get_checked('wple_export_tables', $checked, $table);
 			?>
 				<li><label>
-					<input type="checkbox" name="wple_export_tables[]" value="<?php echo $table ?>" <?php if($checked) echo 'checked="checked"'; ?>>
+					<input type="checkbox" name="wple_export_tables[]" value="<?php echo $table ?>" <?php echo $checked; ?>>
 					<?php echo $table; ?>
 				</label></li>
 			<?php endforeach ?>
 		</ul>
+		<input type="hidden" name="wple_export_tables[]" value="">
 
 		<p class="submit"><input type="submit" name="submit" id="submit" class="button-secondary" value="<?php echo __('Download Export File') ?>"></p>
 	</form>

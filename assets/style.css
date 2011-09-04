@@ -1,1 +1,9 @@
 #icon-lime-export { background: url(icon.png) no-repeat 0 0; }
+#export-filters {}
+#export-filters code { background: transparent; font-style: normal; }
+#export-filters .export-settings { margin: 0 0 18px 18px; }
+#export-filters .export-settings label { cursor: default; }
+#export-filters .tables-list { margin-left: 10px; }
+#export-filters .tables-list li { color: #000; }
+#export-filters .tables-list li label { font-family: monospace; user-select: none; -webkit-user-select: none; -moz-user-select: -moz-none; }
+#export-filters .tables-list li.inactive { color: #999; }

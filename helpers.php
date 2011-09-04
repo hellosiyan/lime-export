@@ -35,6 +35,24 @@ function wple_get_existing_tables() {
     ', 0);
 }
 
+function wple_get_checked( $name, $default='', $value='') {
+    if ( isset($_POST[$name]) && ( empty($value) || $_POST[$name] == $value ) ) {
+        return 'checked="checked"';
+    } elseif ( isset($_POST[$name]) && is_array($_POST[$name]) && in_array($value, $_POST[$name]) ) {
+        return 'checked="checked"';
+    } elseif ( empty($value) || (!isset($_POST[$name]) || !is_array($_POST[$name])) ) {
+        return $default;
+    }
+    return '';
+}
+
+function wple_get_postval( $name, $default='') {
+    if ( isset($_POST[$name]) ) {
+        return $_POST[$name];
+    }
+    return $default;
+}
+
 class WPLE_Exception extends Exception {
     private $err_num;
 
