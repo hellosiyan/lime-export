@@ -58,16 +58,19 @@
 		<ul class="tables-list">
 			<?php foreach ($tables as $table): 
 				$table = preg_replace('~^' . preg_quote($wpdb->prefix) . '~', '', $table);
-				$checked = in_array($table, $core_tables) ? 'checked="checked"': '';
-				$checked = wple_get_checked('wple_export_tables', $checked, $table);
+				$is_standard = in_array($table, $core_tables);
+				$checked = wple_get_checked('wple_export_tables', ($is_standard?'checked="checked"':''), $table);
 			?>
-				<li><label>
+				<li <?php if($is_standard) echo 'class="standard"'; ?>><label>
 					<input type="checkbox" name="wple_export_tables[]" value="<?php echo $table ?>" <?php echo $checked; ?>>
 					<?php echo $table; ?>
 				</label></li>
 			<?php endforeach ?>
+			<li>
+				<p>Select: <a href="#" data-action="select-all">All</a> / <a href="#" data-action="select-none">None</a> / <a href="#" data-action="select-standard">Standard</a></p>
+				<input type="hidden" name="wple_export_tables[]" value="">
+			</li>
 		</ul>
-		<input type="hidden" name="wple_export_tables[]" value="">
 
 		<p class="submit"><input type="submit" name="submit" id="submit" class="button-secondary" value="<?php echo __('Download Export File') ?>"></p>
 	</form>
