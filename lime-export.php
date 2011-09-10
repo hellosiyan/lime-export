@@ -71,7 +71,15 @@ function wple_do_export() {
 
 	$config = wple_export_config();
 
-	$filename = preg_replace(array('~@host@~i', '~@database@~i', '~@date@~i'), array($wpdb->dbhost, $wpdb->dbname, date('Y-m-d')), $config['file_name']) . '.sql';
+	$filename = preg_replace(array(
+			'~@host@~i', 
+			'~@database@~i', 
+			'~@date@~i'
+		), array(
+			( empty($wpdb->dbhost) ? 'localhost': $wpdb->dbhost ), 
+			$wpdb->dbname,
+			date('Y-m-d')
+		), $config['file_name']) . '.sql';
 	$export_tables = $_POST['wple_export_tables'];
 	$existing_tables = wple_get_existing_tables();
 
@@ -260,9 +268,7 @@ function wple_export_data($table, $sql_query, $config) {
         } else {
             $insert_line  = '(' . implode(', ', $values) . ')';
             if ( WPLE_MAX_QUERY_SIZE > 0 && $query_size + strlen($insert_line) > WPLE_MAX_QUERY_SIZE) {
-                if (!wple_output_handler(";\n")) {
-                    return FALSE;
-                }
+                wple_output_handler(";\n");
                 $query_size = 0;
                 $current_row = 1;
                 $insert_line = $schema_insert . $insert_line;
