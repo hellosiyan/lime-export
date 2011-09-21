@@ -64,6 +64,19 @@ function wple_admin_init() {
 				}
 			}
 			throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+		} elseif( isset($_POST['action']) && $_POST['action'] == 'delete' && check_admin_referer('wple_snapshot', 'wple_snapshot') ) {
+			if ( empty( $_POST['checked'] ) ) {
+				throw new WPLE_Exception(WPLE_MSG_NO_SELECTION);
+			}
+
+			$snapshots = wple_get_snapshots();
+
+			foreach ($snapshots as $snapshot) {
+				if ( in_array($snapshot['filename'], $_POST['checked']) ) {
+					wple_remove_snapshot($snapshot['filename']);
+				}
+			}
+			wp_redirect( add_query_arg() );
 		}
 	} catch (WPLE_Exception $e) {
 		$_GET['message'] = $e->getErrNum();
@@ -79,7 +92,7 @@ function wple_admin_page_snapshots() {
 	global $wpdb;
 
 	$snapshots = wple_get_snapshots();
-	array_reverse($snapshots);
+	$snapshots = array_reverse($snapshots);
 	$date_format = get_option('date_format') . ' ' . get_option('time_format');
 
 	include(WPLE_PATH . '/snapshots-page.php');
@@ -424,7 +437,7 @@ function wple_export_config() {
 	}
 
 	if ( isset($_POST['wple_dump_name']) ) {
-		$config['file_name'] = preg_replace(array('~[^\w\d.@\-_]~'), array(''), $_POST['wple_dump_name']);
+		$config['file_name'] = preg_replace(array('~ ~', '(^_+|_+$)', '~_+~', '~[^\w\d.@\-_]~'), array('_', '', '_', ''), $_POST['wple_dump_name']);
 		if ( empty($config['file_name']) ) {
 			$config['file_name'] = '@DATABASE@.@DATE@';
 		}

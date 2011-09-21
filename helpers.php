@@ -10,13 +10,23 @@ function wple_snapshot_dir() {
 		}
 
 		mkdir($upload_dir);
+		touch($upload_dir . '/list.csv');
 		
+		// create htaccess
 		$htacc = fopen($upload_dir . '/.htaccess', 'w');
 		if ( !$htacc ) {
 			throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
 		}
 		fwrite($htacc, "Order allow,deny\nDeny from all");
 		fclose( $htacc );
+		
+		// create dummy index.php
+		$index = fopen($upload_dir . '/index.php', 'w');
+		if ( !$index ) {
+			throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+		}
+		fwrite($index, "<?php");
+		fclose( $index );
 	}
 	
 	return $upload_dir;
@@ -73,6 +83,14 @@ function wple_get_postval( $name, $default='') {
 		return $_POST[$name];
 	}
 	return $default;
+}
+
+function wple_format_bytes($size) {
+    $units = array(' B', ' KB', ' MB', ' GB', ' TB');
+    for ($i = 0; $size >= 1024 && $i < 4; $i++) 
+    	$size /= 1024;
+
+    return round($size, 2) . $units[$i];
 }
 
 class WPLE_Exception extends Exception {

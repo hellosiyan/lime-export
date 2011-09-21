@@ -17,6 +17,7 @@ function wple_get_snapshots() {
 			'filename' => $data[0],
 			'tables' => explode('|', $data[1]),
 			'created' => intval($data[2]),
+			'size' => wple_format_bytes(intval($data[3])),
 		);
 	}
 
@@ -33,7 +34,7 @@ function wple_add_snapshot( $filename, $tables, $time = null ) {
 		throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
 	}
 
-	fputcsv($csv, array($filename, implode('|', $tables), $time) );
+	fputcsv($csv, array($filename, implode('|', $tables), $time, filesize($dir . $filename)) );
 	fclose($csv);
 }
 
