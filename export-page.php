@@ -1,5 +1,9 @@
 <div class="wrap">
-	<div id="icon-lime-export" class="icon32"><br></div><h2><?php echo __('Database Export'); ?></h2>
+	<div id="icon-lime-export" class="icon32"><br></div>
+	<h2 class="nav-tab-wrapper">
+		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Database Export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots'); ?></a>
+	</h2>
+
 	<?php 
 	if ( isset($_GET['message']) ) {
 		switch ( $_GET['message'] ) {
@@ -7,10 +11,13 @@
 				$msg = __('No tables selected for export.');
 				break;
 			case WPLE_MSG_NO_SPACE:
-				$msg = __('Insufficient space to save the temp file.');
+				$msg = __('Insufficient space to save the file.');
 				break;
-			case WPLE_MSG_TMPFILE_ERROR:
-				$msg = __('Error creating temporary file.');
+			case WPLE_MSG_FILE_CREAT_ERROR:
+				$msg = __('Error creating file.');
+				break;
+			case WPLE_MSG_NOT_APACHE:
+				$msg = __('This feature requires Apache Web Server.');
 				break;
 		}
 
@@ -72,6 +79,9 @@
 			</li>
 		</ul>
 
-		<p class="submit"><input type="submit" name="submit" id="submit" class="button-secondary" value="<?php echo __('Download Export File') ?>"></p>
+		<p class="submit">
+			<input type="submit" name="submit" id="submit" class="button-secondary" value="<?php echo __('Download Export File') ?>">
+			<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php echo __('Save as Snapshot') ?>">
+		</p>
 	</form>
 </div>

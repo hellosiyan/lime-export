@@ -7,3 +7,5 @@
 #export-filters .tables-list li { color: #000; }
 #export-filters .tables-list li label { font-family: monospace; user-select: none; -webkit-user-select: none; -moz-user-select: -moz-none; }
 #export-filters .tables-list li.inactive { color: #999; }
+
+.wp-list-table.wple-snapshots .snapshot-description ul li { margin-bottom: 0; }

@@ -26,29 +26,66 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 include_once('config.php');
 include_once('helpers.php');
+include_once('lime-snapshots.php');
 
 add_action( 'admin_menu', 'wple_register_pages' );
 add_action( 'load-tools_page_lime-export', 'wple_admin_init' );
+add_action( 'load-tools_page_lime-snapshots', 'wple_admin_init' );
 
 function wple_register_pages() {
-	add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'manage_options', 'lime-export', 'wple_admin_page');
+	if ( isset($_GET['page']) && $_GET['page'] == 'lime-snapshots' ) {
+		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'manage_options', 'lime-snapshots', 'wple_admin_page_snapshots');
+	} else {
+		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'manage_options', 'lime-export', 'wple_admin_page_export');
+	}
 }
 
 function wple_admin_init() {
-	if ( isset($_POST['wple_download']) && check_admin_referer('wple_download','wple_download') ) {
-		try {
-			wple_do_export();
-		} catch (WPLE_Exception $e) {
-			$_GET['message'] = $e->getErrNum();
-			// wp_redirect( add_query_arg('message', $e->getErrNum()) );
+	try {
+		if ( isset($_POST['wple_download']) && check_admin_referer('wple_download','wple_download') ) {
+				wple_do_export();
+		} elseif ( isset($_GET['download']) ) {
+			$snapshots = wple_get_snapshots();
+
+			foreach ($snapshots as $snapshot) {
+				if ( $_GET['download'] == $snapshot['filename'] ) {
+					wple_do_snapshot_download($snapshot['filename']);
+					exit();
+				}
+			}
+			throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+		} elseif ( isset($_GET['delete']) ) {
+			$snapshots = wple_get_snapshots();
+
+			foreach ($snapshots as $snapshot) {
+				if ( $_GET['delete'] == $snapshot['filename'] ) {
+					wple_remove_snapshot($snapshot['filename']);
+					wp_redirect( remove_query_arg('delete') );
+				}
+			}
+			throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
 		}
+	} catch (WPLE_Exception $e) {
+		$_GET['message'] = $e->getErrNum();
+		// wp_redirect( add_query_arg('message', $e->getErrNum()) );
 	}
+
 
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css');
 	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/func.js');
 }
 
-function wple_admin_page() {
+function wple_admin_page_snapshots() {
+	global $wpdb;
+
+	$snapshots = wple_get_snapshots();
+	array_reverse($snapshots);
+	$date_format = get_option('date_format') . ' ' . get_option('time_format');
+
+	include(WPLE_PATH . '/snapshots-page.php');
+}
+
+function wple_admin_page_export() {
 	global $wpdb;
 
 	$tables = wple_get_existing_tables();
@@ -98,7 +135,7 @@ function wple_do_export() {
 	$table_separator = "\n-- --------------------------------------------------------\n\n";
 
 	if ( !$wple_export_file ) {
-		throw new WPLE_Exception( WPLE_MSG_TMPFILE_ERROR );
+		throw new WPLE_Exception( WPLE_MSG_FILE_CREAT_ERROR );
 	}
 
 	$head = "-- Lime Export SQL Dump\n" .
@@ -133,6 +170,21 @@ function wple_do_export() {
 
 	$wpdb->query('SET time_zone = "' . $old_tz . '"');
 
+	if ( isset( $_POST['wple_save_snapshot'] ) ) {
+		wple_do_export_snapshot($filename, $export_tables);
+		fclose($wple_export_file);
+	} else {
+		wple_do_export_download($filename);
+		exit();	
+	}
+}
+
+function wple_do_export_download( $filename ) {
+	global $wple_export_file;
+
+	if ( !$wple_export_file ) {
+		return false;
+	}
 
 	header('Content-Type: text/x-sql');
 	header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
@@ -151,7 +203,56 @@ function wple_do_export() {
 	rewind($wple_export_file);
 	fpassthru($wple_export_file);
 
-	exit();
+	return true;
+}
+
+function wple_do_snapshot_download( $filename ) {
+	if ( !is_file(wple_snapshot_dir() . '/' . $filename) ) {
+		throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+	}
+
+	header('Content-Type: text/x-sql');
+	header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+	header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+    if ( isset($_SERVER['HTTP_USER_AGENT']) && preg_match('~MSIE ([0-9].[0-9]{1,2})~', $_SERVER['HTTP_USER_AGENT']) ) {
+    	// IE?
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+        header('Pragma: public');
+    } else {
+        header('Pragma: no-cache');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+    }
+
+	readfile(wple_snapshot_dir() . '/' . $filename);
+
+	return true;
+}
+
+function wple_do_export_snapshot( $filename, $export_tables ) {
+	global $wple_export_file;
+
+	$dir = wple_snapshot_dir() . '/';
+	$basename = preg_replace('~\.sql$~', '', $filename);
+	$copy_counter = 1;
+	while ( is_file($dir . $filename) ) {
+		$filename = $basename . '_(' . $copy_counter . ').sql';
+		$copy_counter ++;
+	}
+
+	$snaphot_file = fopen($dir . $filename, 'w');
+	if ( !$snaphot_file ) {
+		throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+	}
+
+	fflush($wple_export_file);
+	rewind($wple_export_file);
+	stream_copy_to_stream($wple_export_file, $snaphot_file);
+	fclose($snaphot_file);
+
+	wple_add_snapshot($filename, $export_tables);
+
+	return $filename;
 }
 
 function wple_export_structure($table, $config) {
