@@ -19,6 +19,10 @@
 			case WPLE_MSG_NOT_APACHE:
 				$msg = __('This feature requires Apache Web Server.');
 				break;
+			default:
+				if ( is_string( $_GET['message'] ) ) {
+					$msg = strip_tags($_GET['message'], '<br><code><em><strong>');
+				}
 		}
 
 		if ( !empty($msg) ) {

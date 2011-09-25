@@ -265,6 +265,8 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 
 	wple_add_snapshot($filename, $export_tables);
 
+	$_GET['message'] = sprintf('Created snapshot <code>%s</code>', $filename);
+
 	return $filename;
 }
 
