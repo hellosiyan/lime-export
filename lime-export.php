@@ -34,9 +34,9 @@ add_action( 'load-tools_page_lime-snapshots', 'wple_admin_init' );
 
 function wple_register_pages() {
 	if ( isset($_GET['page']) && $_GET['page'] == 'lime-snapshots' ) {
-		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'manage_options', 'lime-snapshots', 'wple_admin_page_snapshots');
+		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'export', 'lime-snapshots', 'wple_admin_page_snapshots');
 	} else {
-		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'manage_options', 'lime-export', 'wple_admin_page_export');
+		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'export', 'lime-export', 'wple_admin_page_export');
 	}
 }
 
