@@ -83,6 +83,12 @@ jQuery(function($) {
 		$('.snapshot-title .delete a').click(function() {
 			return confirm('DELETE snapshot ' + $(this).closest('.snapshot-title').find('strong:first').text() + '?');
 		});
+
+		$('#doaction').click(function() {
+			if ( $(this).prev('select').val() == 'delete' ) {
+				return confirm('Delete selected snapshots?');
+			};
+		});
 	})();};
 
 });

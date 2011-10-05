@@ -39,7 +39,7 @@
 		<p><?php 
 		$public_dir = wp_upload_dir();
 		$public_dir = $public_dir['baseurl'] . '/wple-snapshots/';
-		printf(__('Snapshot files are located in <code>%s</code>.<br/>Please ensure it is not accessible <a href="%s">from the web</a>.'), wple_snapshot_dir(), $public_dir);
+		printf(__('Snapshot files are located in <code>%s</code>.<br/>Please ensure the directory is not accessible <a href="%s">from the web</a>.'), wple_snapshot_dir(), $public_dir);
 		?></p>
 
 		<div class="tablenav top">
