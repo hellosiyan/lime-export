@@ -95,7 +95,7 @@ function wple_admin_page_snapshots() {
 	$snapshots = array_reverse($snapshots);
 	$date_format = get_option('date_format') . ' ' . get_option('time_format');
 
-	include(WPLE_PATH . '/snapshots-page.php');
+	include(WPLE_PATH . '/page-snapshots.php');
 }
 
 function wple_admin_page_export() {
@@ -109,7 +109,7 @@ function wple_admin_page_export() {
 		'data' => __('Data'),
 	);
 
-	include(WPLE_PATH . '/export-page.php');
+	include(WPLE_PATH . '/page-export.php');
 }
 
 function wple_do_export() {
