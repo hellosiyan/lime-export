@@ -3,6 +3,7 @@
 Plugin Name: Lime Export
 Description: Advanced Database export utility
 Version: 0.2
+Plugin URI: https://github.com/xsisqox/lime-export
 Author: Siyan Panayotov
 Author URI: http://sleeping-sailor.com
 License: GPLv2 or later
