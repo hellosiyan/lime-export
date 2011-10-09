@@ -2,6 +2,8 @@
 Tags: export, database, backup, lime
 Requires at least: 3.2.1
 Tested up to: 3.2.1
+Stable tag: trunk
+Contributors: Siyan Panayotov <xsisqox@gmail.com>
 
 Database export utility.
 
@@ -15,6 +17,11 @@ Your data may contain sensitive information, that's why great attention is spent
 
 1. Upload `lime-export` to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
+
+== Screenshots ==
+
+1. Export options
+2. View snapshots
 
 == Changelog ==
 
