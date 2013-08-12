@@ -3,22 +3,26 @@
 function wple_snapshot_dir() {
 	$upload_dir = wp_upload_dir();
 	$upload_dir = $upload_dir['basedir'] . '/wple-snapshots';
+	
+	return $upload_dir;
+}
+
+function wple_create_snapshot_dir() {
+	$upload_dir = wple_snapshot_dir();
 
 	if ( !is_dir( $upload_dir ) ) {
 		if ( !preg_match('~apache~i', $_SERVER['SERVER_SOFTWARE']) ) {
 			throw new WPLE_Exception(WPLE_MSG_NOT_APACHE);
 		}
 
-		mkdir($upload_dir);
-		touch($upload_dir . '/list.csv');
-		
-		// create htaccess
-		$htacc = fopen($upload_dir . '/.htaccess', 'w');
-		if ( !$htacc ) {
-			throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+		if ( !@mkdir($upload_dir, 0777, true) ) {
+			throw new WPLE_Exception(sprintf(
+				__('Unable to create directory %s. Is its parent directory writable by the server?'),
+				str_replace(ABSPATH, '/', $upload_dir)
+				));
 		}
-		fwrite($htacc, "Order allow,deny\nDeny from all");
-		fclose( $htacc );
+
+		touch($upload_dir . '/list.csv');
 		
 		// create dummy index.php
 		$index = fopen($upload_dir . '/index.php', 'w');
@@ -28,8 +32,6 @@ function wple_snapshot_dir() {
 		fwrite($index, "<?php");
 		fclose( $index );
 	}
-	
-	return $upload_dir;
 }
 
 function wple_addslashes($str = '', $is_like = false, $line_endings = false) {

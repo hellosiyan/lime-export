@@ -29,9 +29,25 @@ include_once('config.php');
 include_once('helpers.php');
 include_once('lime-snapshots.php');
 
-add_action( 'admin_menu', 'wple_register_pages' );
-add_action( 'load-tools_page_lime-export', 'wple_admin_init' );
-add_action( 'load-tools_page_lime-snapshots', 'wple_admin_init' );
+add_action( 'init', 'wple_init' );
+
+function wple_init() {
+	global $wple_error_messages;
+	$wple_error_messages = array();
+
+	# Create required directory structure
+	try {
+		wple_create_snapshot_dir();
+	} catch (WPLE_Exception $e) {
+		$wple_error_messages[] = $e->getErrNum();
+	}
+
+	# Register hooks
+	add_action( 'admin_notices', 'wple_show_notices' );
+	add_action( 'admin_menu', 'wple_register_pages' );
+	add_action( 'load-tools_page_lime-export', 'wple_admin_init' );
+	add_action( 'load-tools_page_lime-snapshots', 'wple_admin_init' );
+}
 
 function wple_register_pages() {
 	if ( isset($_GET['page']) && $_GET['page'] == 'lime-snapshots' ) {
@@ -39,6 +55,16 @@ function wple_register_pages() {
 	} else {
 		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'export', 'lime-export', 'wple_admin_page_export');
 	}
+}
+
+function wple_show_notices() {
+	global $wple_error_messages;
+
+	if ( empty($wple_error_messages) ) {
+		return;
+	}
+
+	echo '<div id="message" class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $wple_error_messages) . '</p></div>';
 }
 
 function wple_admin_init() {
@@ -81,7 +107,6 @@ function wple_admin_init() {
 		}
 	} catch (WPLE_Exception $e) {
 		$_GET['message'] = $e->getErrNum();
-		// wp_redirect( add_query_arg('message', $e->getErrNum()) );
 	}
 
 
@@ -94,6 +119,7 @@ function wple_admin_page_snapshots() {
 
 	$snapshots = wple_get_snapshots();
 	$snapshots = array_reverse($snapshots);
+
 	$date_format = get_option('date_format') . ' ' . get_option('time_format');
 
 	include(WPLE_PATH . '/page-snapshots.php');
@@ -130,7 +156,8 @@ function wple_do_export() {
 			( empty($wpdb->dbhost) ? 'localhost': $wpdb->dbhost ), 
 			$wpdb->dbname,
 			date('Y-m-d')
-		), $config['file_name']) . '.sql';
+		), $config['file_name']) . '.php';
+
 	$export_tables = $_POST['wple_export_tables'];
 	$existing_tables = wple_get_existing_tables();
 
@@ -152,7 +179,8 @@ function wple_do_export() {
 		throw new WPLE_Exception( WPLE_MSG_FILE_CREAT_ERROR );
 	}
 
-	$head = "-- Lime Export SQL Dump\n" .
+	$head = "-- <?php exit(); ?>\n" .
+	 		"-- Lime Export SQL Dump\n" .
 			"-- version " . WPLE_VERSION . "\n" . 
 			"--\n" .
 			"-- Host: " . $wpdb->dbhost . "\n" .
@@ -227,7 +255,7 @@ function wple_do_snapshot_download( $filename ) {
 
 	header('Content-Type: text/x-sql');
 	header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-	header('Content-Disposition: attachment; filename="' . $filename . '"');
+	header('Content-Disposition: attachment; filename="' . str_replace('.php', '.sql', $filename) . '"');
 
     if ( isset($_SERVER['HTTP_USER_AGENT']) && preg_match('~MSIE ([0-9].[0-9]{1,2})~', $_SERVER['HTTP_USER_AGENT']) ) {
     	// IE?
@@ -245,12 +273,13 @@ function wple_do_snapshot_download( $filename ) {
 
 function wple_do_export_snapshot( $filename, $export_tables ) {
 	global $wple_export_file;
+	global $wple_error_messages;
 
 	$dir = wple_snapshot_dir() . '/';
-	$basename = preg_replace('~\.sql$~', '', $filename);
+	$basename = preg_replace('~\.php$~', '', $filename);
 	$copy_counter = 1;
 	while ( is_file($dir . $filename) ) {
-		$filename = $basename . '_(' . $copy_counter . ').sql';
+		$filename = $basename . '_(' . $copy_counter . ').php';
 		$copy_counter ++;
 	}
 
@@ -266,7 +295,10 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 
 	wple_add_snapshot($filename, $export_tables);
 
-	$_GET['message'] = sprintf('Created snapshot <code>%s</code>', $filename);
+	$wple_error_messages[] = sprintf(
+			__('Created snapshot <code>%s</code>'), 
+			str_replace('.php', '.sql', $filename)
+		);
 
 	return $filename;
 }

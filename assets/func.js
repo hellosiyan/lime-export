@@ -69,11 +69,11 @@ jQuery(function($) {
 			if ( tables.length > 0 ) {
 				tables.hide().prev().append($('<a href="#">View all <small>(' + tables.children().length + ')</small></a>').click(function() {
 					if ( tables.is(':visible') ) {
-						tables.slideUp();
-						$th.html('View all <small>(' + tables.children().length + ')</small>');
+						tables.hide();
+						$(this).html('View all <small>(' + tables.children().length + ')</small>');
 					} else {
-						tables.slideDown();
-						$th.text('Hide');	
+						tables.show();
+						$(this).text('Hide');	
 					}
 					return false;
 				}));

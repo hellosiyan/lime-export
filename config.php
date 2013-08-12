@@ -1,6 +1,6 @@
 <?php 
 
-define('WPLE_VERSION', '0.1');
+define('WPLE_VERSION', '0.2');
 
 define('WPLE_PATH', dirname(__FILE__));
 define('WPLE_URL', WP_PLUGIN_URL . '/' . basename(WPLE_PATH) );

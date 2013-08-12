@@ -37,9 +37,10 @@
 		<?php wp_nonce_field('wple_snapshot','wple_snapshot'); ?>
 
 		<p><?php 
-		$public_dir = wp_upload_dir();
-		$public_dir = $public_dir['baseurl'] . '/wple-snapshots/';
-		printf(__('Snapshot files are located in <code>%s</code>.<br/>Please ensure the directory is not accessible <a href="%s">from the web</a>.'), wple_snapshot_dir(), $public_dir);
+		printf(
+			__('Snapshot files are located in <code>%s</code>.'), 
+			str_replace(ABSPATH, '/', wple_snapshot_dir())
+		);
 		?></p>
 
 		<div class="tablenav top">
@@ -83,7 +84,7 @@
 							</th>
 
 							<td class="snapshot-title">
-								<strong><?php echo $snapshot['filename'] ?></strong>
+								<strong><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></strong>
 								<div class="row-actions-visible">
 								<span class="deactivate"><a href="<?php echo add_query_arg('download', $snapshot['filename']) ?>" title=""><?php echo __('Download') ?></a> | </span>
 								<span class="delete"><a href="<?php echo add_query_arg('delete', $snapshot['filename']) ?>" title="" class="delete"><?php echo __('Delete') ?></a></span></div>
