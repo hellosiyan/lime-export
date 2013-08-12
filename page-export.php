@@ -80,7 +80,7 @@
 		</ul>
 
 		<p class="submit">
-			<input type="submit" name="submit" id="submit" class="button-secondary" value="<?php echo __('Download Export File') ?>">
+			<input type="submit" name="submit" id="submit" class="button-primary" value="<?php echo __('Download Export File') ?>">
 			<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php echo __('Save as Snapshot') ?>">
 		</p>
 	</form>

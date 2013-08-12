@@ -24,7 +24,7 @@ jQuery(function($) {
 
 		$('a[data-action^=select-]', form).click(function() {
 			var tables_list = $(this).closest('.tables-list');
-			switch ( $(this).data('Action') ) {
+			switch ( $(this).attr('data-action') ) {
 				case 'select-all':
 					tables_list.find('input:checkbox:not(:checked)').click();
 					break;
