@@ -45,10 +45,6 @@
 
 		<ul class="export-settings">
 			<li>
-				<label><?php echo __('File name template'); ?>:</label>
-				<input type="text" name="wple_dump_name" value="<?php echo wple_get_postval('wple_dump_name', '@DATABASE@.@DATE@') ?>" size="30" />
-			</li>
-			<li>
 				<label><?php echo __('Include table'); ?>:</label>
 				<select name="wple_dump_format">
 					<?php 

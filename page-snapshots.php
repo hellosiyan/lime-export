@@ -59,8 +59,8 @@
 					<th scope="col" id="cb" class="manage-column column-cb check-column" style="">
 						<input type="checkbox" />
 					</th>
-					<th scope="col" id="name" class="manage-column column-name" style=""><?php echo __('Filename') ?></th>
-					<th scope="col" id="description" class="manage-column column-description" style=""><span><?php echo __('Description') ?></span><span class="sorting-indicator"></span></th>	
+					<th scope="col" id="name" class="manage-column column-name" style=""><span><?php echo __('Filename') ?></span><span class="sorting-indicator"></span></th>
+					<th scope="col" id="description" class="manage-column column-description" style=""><?php echo __('Description') ?></th>	
 				</tr>
 			</thead>
 
@@ -69,8 +69,8 @@
 					<th scope="col" class="manage-column column-cb check-column" style="">
 						<input type="checkbox" />
 					</th>
-					<th scope="col" class="manage-column column-name" style=""><?php echo __('Filename') ?></th>
-					<th scope="col" class="manage-column column-description" style=""><span><?php echo __('Description') ?></span><span class="sorting-indicator"></span></th>
+					<th scope="col" class="manage-column column-name" style=""><span><?php echo __('Filename') ?></span><span class="sorting-indicator"></span></th>
+					<th scope="col" class="manage-column column-description" style=""><?php echo __('Description') ?></th>
 				</tr>
 			</tfoot>
 
@@ -84,17 +84,20 @@
 							</th>
 
 							<td class="snapshot-title">
-								<strong><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></strong>
-								<div class="row-actions-visible">
-								<span class="deactivate"><a href="<?php echo add_query_arg('download', $snapshot['filename']) ?>" title=""><?php echo __('Download') ?></a> | </span>
-								<span class="delete"><a href="<?php echo add_query_arg('delete', $snapshot['filename']) ?>" title="" class="delete"><?php echo __('Delete') ?></a></span></div>
+								<strong><?php echo date($date_format, $snapshot['created']) ?></strong><br/>
+								<em><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></em>
+								<div class="row-actions">
+									<span class="deactivate"><a href="<?php echo add_query_arg('download', $snapshot['filename']) ?>" title=""><?php echo __('Download') ?></a> | </span>
+									<span class="delete"><a href="<?php echo add_query_arg('delete', $snapshot['filename']) ?>" title="" class="delete"><?php echo __('Delete') ?></a></span>
+								</div>
 							</td>
 
 							<td class="column-description desc">
 								<div class="snapshot-description">
-									<p><strong><?php echo __('Date') ?></strong>: <?php echo date($date_format, $snapshot['created']) ?></p>
-									<p><strong><?php echo __('Size') ?></strong>: <?php echo $snapshot['size']; ?></p>
-									<p><strong><?php echo __('Tables') ?></strong>: </p>
+									<p>
+										<strong><?php echo __('Size') ?></strong>: <?php echo $snapshot['size']; ?><br/>
+										<strong><?php echo __('Tables') ?></strong>: 
+									</p>
 									<ul>
 										<?php foreach ($snapshot['tables']  as $table): ?>
 											<li><?php echo $table ?></li>

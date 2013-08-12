@@ -76,7 +76,7 @@ function wple_admin_init() {
 
 			foreach ($snapshots as $snapshot) {
 				if ( $_GET['download'] == $snapshot['filename'] ) {
-					wple_do_snapshot_download($snapshot['filename']);
+					wple_do_snapshot_download($snapshot['filename'], 'dump_' . date('Ymd_His', $snapshot['created']) . '.sql');
 					exit();
 				}
 			}
@@ -147,16 +147,9 @@ function wple_do_export() {
 	}
 
 	$config = wple_export_config();
+	$nice_filename = 'dump_' . date('Ymd_His') . '.sql';
 
-	$filename = preg_replace(array(
-			'~@host@~i', 
-			'~@database@~i', 
-			'~@date@~i'
-		), array(
-			( empty($wpdb->dbhost) ? 'localhost': $wpdb->dbhost ), 
-			$wpdb->dbname,
-			date('Y-m-d')
-		), $config['file_name']) . '.php';
+	$filename = md5(date('r')) . '.php';
 
 	$export_tables = $_POST['wple_export_tables'];
 	$existing_tables = wple_get_existing_tables();
@@ -216,7 +209,7 @@ function wple_do_export() {
 		wple_do_export_snapshot($filename, $export_tables);
 		fclose($wple_export_file);
 	} else {
-		wple_do_export_download($filename);
+		wple_do_export_download($nice_filename);
 		exit();	
 	}
 }
@@ -248,14 +241,14 @@ function wple_do_export_download( $filename ) {
 	return true;
 }
 
-function wple_do_snapshot_download( $filename ) {
+function wple_do_snapshot_download( $filename, $nice_filename ) {
 	if ( !is_file(wple_snapshot_dir() . '/' . $filename) ) {
 		throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
 	}
 
 	header('Content-Type: text/x-sql');
 	header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-	header('Content-Disposition: attachment; filename="' . str_replace('.php', '.sql', $filename) . '"');
+	header('Content-Disposition: attachment; filename="' . $nice_filename . '"');
 
     if ( isset($_SERVER['HTTP_USER_AGENT']) && preg_match('~MSIE ([0-9].[0-9]{1,2})~', $_SERVER['HTTP_USER_AGENT']) ) {
     	// IE?
@@ -469,13 +462,6 @@ function wple_export_config() {
 
 	if ( $preset != 'custom' ) {
 		return $config;
-	}
-
-	if ( isset($_POST['wple_dump_name']) ) {
-		$config['file_name'] = preg_replace(array('~ ~', '(^_+|_+$)', '~_+~', '~[^\w\d.@\-_]~'), array('_', '', '_', ''), $_POST['wple_dump_name']);
-		if ( empty($config['file_name']) ) {
-			$config['file_name'] = '@DATABASE@.@DATE@';
-		}
 	}
 
 	if ( isset($_POST['wple_dump_format']) ) {
