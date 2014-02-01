@@ -17,7 +17,7 @@ function wple_create_snapshot_dir() {
 
 		if ( !@mkdir($upload_dir, 0777, true) ) {
 			throw new WPLE_Exception(sprintf(
-				__('Unable to create directory %s. Is its parent directory writable by the server?'),
+				__('Unable to create directory %s. Is its parent directory writable by the server?', 'lime-export'),
 				str_replace(ABSPATH, '/', $upload_dir)
 				));
 		}

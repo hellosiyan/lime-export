@@ -1,4 +1,4 @@
-#icon-lime-export { background: url(icon.png) no-repeat 0 0; }
+#icon-lime-export { background: url(icon.png) no-repeat 0 0; display: block; width: 36px; height: 34px; float: left; margin-right: 10px; }
 #export-filters {}
 #export-filters code { background: transparent; font-style: normal; }
 #export-filters .export-settings { margin: 0 0 18px 18px; }

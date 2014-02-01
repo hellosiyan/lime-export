@@ -51,9 +51,9 @@ function wple_init() {
 
 function wple_register_pages() {
 	if ( isset($_GET['page']) && $_GET['page'] == 'lime-snapshots' ) {
-		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'export', 'lime-snapshots', 'wple_admin_page_snapshots');
+		add_submenu_page('tools.php', __('Database Export', 'lime-export'), __('Database Export', 'lime-export'), 'export', 'lime-snapshots', 'wple_admin_page_snapshots');
 	} else {
-		add_submenu_page('tools.php', __('Database Export'), __('Database Export'), 'export', 'lime-export', 'wple_admin_page_export');
+		add_submenu_page('tools.php', __('Database Export', 'lime-export'), __('Database Export', 'lime-export'), 'export', 'lime-export', 'wple_admin_page_export');
 	}
 }
 
@@ -131,9 +131,9 @@ function wple_admin_page_export() {
 	$tables = wple_get_existing_tables();
 	$core_tables = array_merge($wpdb->tables, $wpdb->global_tables, $wpdb->ms_global_tables);
 	$formats = array(
-		'both' => __('Structure and Data'),
-		'structure' => __('Structure'),
-		'data' => __('Data'),
+		'both' => __('Structure and Data', 'lime-export'),
+		'structure' => __('Structure', 'lime-export'),
+		'data' => __('Data', 'lime-export'),
 	);
 
 	include(WPLE_PATH . '/page-export.php');
@@ -289,7 +289,7 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 	wple_add_snapshot($filename, $export_tables);
 
 	$wple_error_messages[] = sprintf(
-			__('Created snapshot <code>%s</code>'), 
+			__('Created snapshot <code>%s</code>', 'lime-export'), 
 			str_replace('.php', '.sql', $filename)
 		);
 
@@ -299,7 +299,7 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 function wple_export_structure($table, $config) {
 	global $wpdb;
 
-	$schema_create = wple_export_comment( __('Table structure for table') . ' ' . $table) . "\n";
+	$schema_create = wple_export_comment( sprintf(__('Table structure for table %s', 'lime-export'), $table)) . "\n";
     $auto_increment = '';
 
     if ( $config['add_drop_table'] ) {
@@ -374,7 +374,7 @@ function wple_export_data($table, $sql_query, $config) {
 		$i++;
 	}
 
-	$schema_insert = "\n" . wple_export_comment( __('Dumping data for table') . ' ' . $table ) . "\n";
+	$schema_insert = "\n" . wple_export_comment( sprintf(__('Dumping data for table %s', 'lime-export'), $table) ) . "\n";
 	$schema_insert .= "INSERT INTO `" . $table . "` (`" . implode('`, `', $field_set) . "`) VALUES\n";
 
 	while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
