@@ -1,9 +1,9 @@
 === Plugin Name ===
-Tags: export, database, backup, lime
+Tags: database, export, snapshot, backup, db, lime
 Requires at least: 3.2.1
 Tested up to: 3.6
 Stable tag: trunk
-Contributors: Siyan Panayotov <xsisqox@gmail.com>
+Contributors: xsisqox
 
 Database export utility.
 
@@ -24,6 +24,10 @@ Your data may contain sensitive information, that's why great attention is spent
 2. View snapshots
 
 == Changelog ==
+
+= 0.4 =
+* Improve i18n
+* Fix styling in WP 3.8
 
 = 0.3 =
 * Save snapshots as PHP files for better prevention from leaking online
