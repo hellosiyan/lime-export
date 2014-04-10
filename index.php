@@ -50,14 +50,11 @@ include_once('lib/lime-snapshots.php');
 add_action( 'init', 'wple_init' );
 
 function wple_init() {
-	global $wple_error_messages;
-	$wple_error_messages = array();
-
 	# Create required directory structure
 	try {
 		wple_create_snapshot_dir();
 	} catch (WPLE_Exception $e) {
-		$wple_error_messages[] = $e->getErrNum();
+		wple_add_admin_notice($e->getMessage());
 	}
 
 	# Register hooks
@@ -80,13 +77,13 @@ function wple_register_pages() {
 }
 
 function wple_show_notices() {
-	global $wple_error_messages;
+	$notices = wple_get_admin_notices();
 
-	if ( empty($wple_error_messages) ) {
+	if ( empty($notices) ) {
 		return;
 	}
 
-	echo '<div id="message" class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $wple_error_messages) . '</p></div>';
+	echo '<div id="message" class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $notices) . '</p></div>';
 }
 
 function wple_admin_init() {
@@ -104,7 +101,7 @@ function wple_admin_init() {
 			wp_redirect( add_query_arg() );
 		}
 	} catch (WPLE_Exception $e) {
-		$_GET['message'] = $e->getErrNum();
+		wple_add_admin_notice($e->getMessage());
 	}
 
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css');
@@ -127,7 +124,7 @@ function wple_admin_handle_snapshot_download($snapshot_filename) {
 		}
 	}
 
-	throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+	throw new WPLE_Exception( __('The snapshot you requested is missing', 'lime-export') );
 }
 
 function wple_admin_handle_snapshot_delete($snapshot_filename) {
@@ -142,14 +139,14 @@ function wple_admin_handle_snapshot_delete($snapshot_filename) {
 		}
 	}
 
-	throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+	throw new WPLE_Exception( __('The snapshot you requested is missing', 'lime-export') );
 }
 
 function wple_admin_handle_snapshot_delete_bulk() {
 	check_admin_referer( 'wple_snapshot-action', 'wple_snapshot-action' );
 
 	if ( empty( $_POST['checked'] ) ) {
-		throw new WPLE_Exception(WPLE_MSG_NO_SELECTION);
+		throw new WPLE_Exception( __('No snapshots selected', 'lime-export') );
 	}
 
 	$snapshots = wple_get_snapshots();
@@ -179,7 +176,7 @@ function wple_do_export() {
 	global $wpdb, $wple_export_file, $wple_time_start;
 
 	if ( empty($_POST['wple_export_tables']) ) {
-		throw new WPLE_Exception( WPLE_MSG_NO_SELECTION );
+		throw new WPLE_Exception( __('No tables selected for export', 'lime-export') );
 	}
 
 	$config = wple_export_config();
@@ -197,7 +194,7 @@ function wple_do_export() {
 	}
 
 	if ( empty($export_tables) ) {
-		throw new WPLE_Exception( WPLE_MSG_NO_SELECTION );
+		throw new WPLE_Exception( __('No tables selected for export', 'lime-export') );
 	}
 
 	$wple_export_file = tmpfile();
@@ -205,7 +202,7 @@ function wple_do_export() {
 	$table_separator = "\n-- --------------------------------------------------------\n\n";
 
 	if ( !$wple_export_file ) {
-		throw new WPLE_Exception( WPLE_MSG_FILE_CREAT_ERROR );
+		throw new WPLE_Exception( __('Error creating export file', 'lime-export') );
 	}
 
 	$head = "-- <?php exit(); ?>\n" .
@@ -279,7 +276,6 @@ function wple_do_export_download( $filename ) {
 
 function wple_do_export_snapshot( $filename, $export_tables ) {
 	global $wple_export_file;
-	global $wple_error_messages;
 
 	$dir = wple_snapshot_dir() . '/';
 	$basename = preg_replace('~\.php$~', '', $filename);
@@ -291,7 +287,10 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 
 	$snaphot_file = fopen($dir . $filename, 'w');
 	if ( !$snaphot_file ) {
-		throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+		throw new WPLE_Exception( sprintf(
+			__('Cannot open file <code>%s</code>', 'lime-export'), 
+			$dir . $filename
+		));
 	}
 
 	fflush($wple_export_file);
@@ -301,10 +300,10 @@ function wple_do_export_snapshot( $filename, $export_tables ) {
 
 	wple_add_snapshot($filename, $export_tables);
 
-	$wple_error_messages[] = sprintf(
-			__('Created snapshot <code>%s</code>', 'lime-export'), 
-			str_replace('.php', '.sql', $filename)
-		);
+	wple_add_admin_notice( sprintf(
+		__('Created snapshot <code>%s</code>', 'lime-export'), 
+		str_replace('.php', '.sql', $filename)
+	));
 
 	return $filename;
 }
@@ -449,7 +448,7 @@ function wple_output_handler( $line ) {
 	
     $write_result = @fwrite($wple_export_file, $line);
     if ( !$write_result || ($write_result != strlen($line))) {
-    	throw new WPLE_Exception( WPLE_MSG_NO_SPACE );
+    	throw new WPLE_Exception( __('Insufficient space to save the file.', 'lime-export') );
     }
 
     $time_now = time();

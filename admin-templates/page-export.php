@@ -11,34 +11,6 @@ if ( !defined('WPINC') ) {
 		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
-	<?php 
-	if ( isset($_GET['message']) ) {
-		switch ( $_GET['message'] ) {
-			case WPLE_MSG_NO_SELECTION:
-				$msg = __('No tables selected for export.', 'lime-export');
-				break;
-			case WPLE_MSG_NO_SPACE:
-				$msg = __('Insufficient space to save the file.', 'lime-export');
-				break;
-			case WPLE_MSG_FILE_CREAT_ERROR:
-				$msg = __('Error creating file.');
-				break;
-			case WPLE_MSG_NOT_APACHE:
-				$msg = __('This feature requires Apache Web Server.', 'lime-export');
-				break;
-			default:
-				if ( is_string( $_GET['message'] ) ) {
-					$msg = strip_tags($_GET['message'], '<br><code><em><strong>');
-				}
-		}
-
-		if ( !empty($msg) ) {
-			echo '<div class="updated"><p><strong>' . $msg . '</strong></p></div>';
-		}
-	}
-
-	?>
-
 	<form action="" method="post" id="export-filters">
 		<?php wp_nonce_field('wple_export','wple_export'); ?>
 	

@@ -18,14 +18,14 @@ function wple_create_snapshot_dir() {
 
 	if ( !is_dir( $upload_dir ) ) {
 		if ( !preg_match('~apache~i', $_SERVER['SERVER_SOFTWARE']) ) {
-			throw new WPLE_Exception(WPLE_MSG_NOT_APACHE);
+			throw new WPLE_Exception( __('This feature requires Apache Web Server.', 'lime-export') );
 		}
 
 		if ( !@mkdir($upload_dir, 0777, true) ) {
-			throw new WPLE_Exception(sprintf(
-				__('Unable to create directory %s. Is its parent directory writable by the server?', 'lime-export'),
+			throw new WPLE_Exception( sprintf(
+				__('Unable to create directory <code>%s</code>. Is its parent directory writable by the server?', 'lime-export'),
 				str_replace(ABSPATH, '/', $upload_dir)
-				));
+			));
 		}
 
 		touch($upload_dir . '/list.csv');
@@ -33,11 +33,34 @@ function wple_create_snapshot_dir() {
 		// create dummy index.php
 		$index = fopen($upload_dir . '/index.php', 'w');
 		if ( !$index ) {
-			throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+			throw new WPLE_Exception( sprintf(
+				__('Cannot open file <code>%s</code>', 'lime-export'), 
+				str_replace(ABSPATH, '/', $upload_dir . '/index.php')
+			));
 		}
 		fwrite($index, "<?php");
 		fclose( $index );
 	}
+}
+
+function wple_add_admin_notice($notice) {
+	global $wple_admin_notices;
+
+	if ( !is_array($wple_admin_notices) ) {
+		$wple_admin_notices = array();
+	}
+	
+	$wple_admin_notices[] = $notice;
+}
+
+function wple_get_admin_notices() {
+	global $wple_admin_notices;
+
+	if ( !is_array($wple_admin_notices) ) {
+		$wple_admin_notices = array();
+	}
+
+	return $wple_admin_notices;
 }
 
 function wple_addslashes($str = '', $is_like = false, $line_endings = false) {
@@ -101,17 +124,6 @@ function wple_format_bytes($size) {
     return round($size, 2) . $units[$i];
 }
 
-class WPLE_Exception extends Exception {
-	private $err_num;
-
-	function WPLE_Exception( $err ) {
-		$this->err_num = $err;
-		$this->message = 'Error #' . $err;
-	}
-
-	function getErrNum() {
-		return $this->err_num;
-	}
-}
+class WPLE_Exception extends Exception { }
 
 

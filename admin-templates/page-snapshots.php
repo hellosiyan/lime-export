@@ -11,35 +11,6 @@ if ( !defined('WPINC') ) {
 		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php echo __('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
-	<?php 
-	if ( isset($_GET['message']) ) {
-		switch ( $_GET['message'] ) {
-			case WPLE_MSG_NO_SELECTION:
-				$msg = __('Nothing selected.', 'lime-export');
-				break;
-			case WPLE_MSG_NO_SPACE:
-				$msg = __('Insufficient space to save the file.', 'lime-export');
-				break;
-			case WPLE_MSG_FILE_CREAT_ERROR:
-				$msg = __('Error creating file.', 'lime-export');
-				break;
-			case WPLE_MSG_FILE_READ_ERROR:
-				$msg = __('Error reading file.', 'lime-export');
-				break;
-			case WPLE_MSG_NOT_APACHE:
-				$msg = __('This feature requires Apache Web Server.', 'lime-export');
-				break;
-			case WPLE_MSG_SNAPSHOT_NOT_FOUND:
-				$msg = __('The snapshot you requested is missing.', 'lime-export');
-		}
-
-		if ( !empty($msg) ) {
-			echo '<div class="updated"><p><strong>' . $msg . '</strong></p></div>';
-		}
-	}
-
-	?>
-
 	<form action="" method="post">
 		<?php wp_nonce_field('wple_snapshot-action','wple_snapshot-action'); ?>
 

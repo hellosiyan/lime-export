@@ -9,7 +9,15 @@ if ( !defined('WPINC') ) {
 function wple_admin_page_snapshots() {
 	global $wpdb;
 
-	$snapshots = wple_get_snapshots();
+	try {
+		$snapshots = wple_get_snapshots();
+	} catch (WPLE_Exception $e) {
+		$snapshots = array();
+
+		wple_add_admin_notice($e->getMessage());
+		do_action('admin_notices');
+	}
+	
 	$snapshots = array_reverse($snapshots);
 
 	$date_format = get_option('date_format') . ' ' . get_option('time_format');
@@ -18,8 +26,13 @@ function wple_admin_page_snapshots() {
 }
 
 function wple_do_snapshot_download( $filename, $nice_filename ) {
-	if ( !is_file(wple_snapshot_dir() . '/' . $filename) ) {
-		throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+	$full_snapshot_path = wple_snapshot_dir() . '/' . $filename;
+
+	if ( !is_file($full_snapshot_path) ) {
+		throw new WPLE_Exception( sprintf(
+			__('The snapshot you requested is missing <code>%s</code>.', 'lime-export'), 
+			str_replace(ABSPATH, '/', $full_snapshot_path)
+		));
 	}
 
 	header('Content-Type: text/x-sql');
@@ -35,7 +48,7 @@ function wple_do_snapshot_download( $filename, $nice_filename ) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
     }
 
-	readfile(wple_snapshot_dir() . '/' . $filename);
+	readfile($full_snapshot_path);
 
 	return true;
 }
@@ -43,9 +56,14 @@ function wple_do_snapshot_download( $filename, $nice_filename ) {
 function wple_get_snapshots() {
 	$snapshots = array();
 	$dir = wple_snapshot_dir() . '/';
-	$csv = fopen($dir . 'list.csv', 'r');
+	$csv_filename = $dir . 'list.csv';
+
+	$csv = fopen($csv_filename, 'r');
 	if ( !$csv ) {
-		throw new WPLE_Exception(WPLE_MSG_FILE_READ_ERROR);
+		throw new WPLE_Exception( sprintf(
+			__('Error reading file <code>%s</code>', 'lime-export'), 
+			str_replace(ABSPATH, '/', $csv_filename)
+		));
 	}
 
 	while (($data = fgetcsv($csv, 1000, ",")) !== FALSE) {
@@ -69,9 +87,14 @@ function wple_add_snapshot( $filename, $tables, $time = null ) {
 	$time = !$time ? time(): $time;
 
 	$dir = wple_snapshot_dir() . '/';
-	$csv = fopen($dir . 'list.csv', 'a');
+	$csv_filename = $dir . 'list.csv';
+
+	$csv = fopen($csv_filename, 'a');
 	if ( !$csv ) {
-		throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+		throw new WPLE_Exception( sprintf(
+			__('Cannot open file <code>%s</code>', 'lime-export'), 
+			str_replace(ABSPATH, '/', $csv_filename)
+		));
 	}
 
 	fputcsv($csv, array($filename, implode('|', $tables), $time, filesize($dir . $filename)) );
@@ -82,9 +105,14 @@ function wple_remove_snapshot( $filename ) {
 	$snapshots = wple_get_snapshots();
 
 	$dir = wple_snapshot_dir() . '/';
+	$csv_filename = $dir . 'list.csv';
+
 	$csv = fopen($dir . 'list.csv', 'w');
 	if ( !$csv ) {
-		throw new WPLE_Exception(WPLE_MSG_FILE_CREAT_ERROR);
+		throw new WPLE_Exception( sprintf(
+			__('Cannot open file <code>%s</code>', 'lime-export'), 
+			str_replace(ABSPATH, '/', $csv_filename)
+		));
 	}
 
 	foreach ($snapshots as $snapshot) {
