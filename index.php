@@ -69,10 +69,14 @@ function wple_init() {
 
 function wple_register_pages() {
 	if ( isset($_GET['page']) && $_GET['page'] == 'lime-snapshots' ) {
-		add_submenu_page('tools.php', __('Database Export', 'lime-export'), __('Database Export', 'lime-export'), 'export', 'lime-snapshots', 'wple_admin_page_snapshots');
+		$menu_slug = 'lime-snapshots';
+		$render_function = 'wple_admin_page_snapshots';
 	} else {
-		add_submenu_page('tools.php', __('Database Export', 'lime-export'), __('Database Export', 'lime-export'), 'export', 'lime-export', 'wple_admin_page_export');
+		$menu_slug = 'lime-export';
+		$render_function = 'wple_admin_page_export';
 	}
+
+	add_submenu_page('tools.php', __('Database Export', 'lime-export'), __('Database Export', 'lime-export'), 'export', $menu_slug, $render_function);
 }
 
 function wple_show_notices() {
@@ -130,17 +134,6 @@ function wple_admin_init() {
 
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css');
 	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/functions.js');
-}
-
-function wple_admin_page_snapshots() {
-	global $wpdb;
-
-	$snapshots = wple_get_snapshots();
-	$snapshots = array_reverse($snapshots);
-
-	$date_format = get_option('date_format') . ' ' . get_option('time_format');
-
-	include(WPLE_PATH . '/admin-templates/page-snapshots.php');
 }
 
 function wple_admin_page_export() {
@@ -255,29 +248,6 @@ function wple_do_export_download( $filename ) {
 	fflush($wple_export_file);
 	rewind($wple_export_file);
 	fpassthru($wple_export_file);
-
-	return true;
-}
-
-function wple_do_snapshot_download( $filename, $nice_filename ) {
-	if ( !is_file(wple_snapshot_dir() . '/' . $filename) ) {
-		throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
-	}
-
-	header('Content-Type: text/x-sql');
-	header('Expires: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-	header('Content-Disposition: attachment; filename="' . $nice_filename . '"');
-
-    if ( isset($_SERVER['HTTP_USER_AGENT']) && preg_match('~MSIE ([0-9].[0-9]{1,2})~', $_SERVER['HTTP_USER_AGENT']) ) {
-    	// IE?
-        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-        header('Pragma: public');
-    } else {
-        header('Pragma: no-cache');
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
-    }
-
-	readfile(wple_snapshot_dir() . '/' . $filename);
 
 	return true;
 }
