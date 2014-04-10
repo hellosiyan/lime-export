@@ -100,8 +100,18 @@ function wple_remove_snapshot( $filename ) {
 	fclose($csv);
 }
 
+function wple_get_snapshot_delete_url($snapshot) {
+	$bare_url = add_query_arg(array('wple-delete' => $snapshot['filename']));
 
+	$complete_url = wp_nonce_url( $bare_url, 'wple_delete-snapshot_' . $snapshot['filename'] );
 
+	return $complete_url;
+}
 
+function wple_get_snapshot_download_url($snapshot) {
+	$bare_url = add_query_arg(array('wple-download' => $snapshot['filename']));
 
+	$complete_url = wp_nonce_url( $bare_url, 'wple_download-snapshot_' . $snapshot['filename'] );
 
+	return $complete_url;
+}

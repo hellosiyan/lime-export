@@ -40,7 +40,7 @@ if ( !defined('WPINC') ) {
 	?>
 
 	<form action="" method="post" id="export-filters">
-		<?php wp_nonce_field('wple_download','wple_download'); ?>
+		<?php wp_nonce_field('wple_export','wple_export'); ?>
 	
 		<p>
 			<label><input type="radio" name="wple_preset" value="standard" <?php echo wple_get_checked('wple_preset', 'checked="checked"', 'standard') ?> /> <?php echo __('Standard export', 'lime-export'); ?></label>

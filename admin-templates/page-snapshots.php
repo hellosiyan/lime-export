@@ -41,7 +41,7 @@ if ( !defined('WPINC') ) {
 	?>
 
 	<form action="" method="post">
-		<?php wp_nonce_field('wple_snapshot','wple_snapshot'); ?>
+		<?php wp_nonce_field('wple_snapshot-action','wple_snapshot-action'); ?>
 
 		<p><?php 
 		printf(
@@ -52,7 +52,7 @@ if ( !defined('WPINC') ) {
 
 		<div class="tablenav top">
 			<div class="alignleft actions">
-				<select name="action">
+				<select name="wple-action">
 					<option value="-1" selected="selected"><?php echo __('Bulk Actions', 'lime-export') ?></option>
 					<option value="delete"><?php echo __('Delete', 'lime-export') ?></option>
 				</select>
@@ -94,8 +94,8 @@ if ( !defined('WPINC') ) {
 								<strong title="<?php echo date('r', $snapshot['created']) ?>"><?php echo date($date_format, $snapshot['created']) ?></strong><br/>
 								<em><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></em>
 								<div class="row-actions">
-									<span class="deactivate"><a href="<?php echo add_query_arg('download', $snapshot['filename']) ?>" title=""><?php echo __('Download', 'lime-export') ?></a> | </span>
-									<span class="delete"><a href="<?php echo add_query_arg('delete', $snapshot['filename']) ?>" title="" class="delete"><?php echo __('Delete', 'lime-export') ?></a></span>
+									<span class="deactivate"><a href="<?php echo esc_attr(wple_get_snapshot_download_url($snapshot)) ?>" title=""><?php echo __('Download', 'lime-export') ?></a> | </span>
+									<span class="delete"><a href="<?php echo esc_attr(wple_get_snapshot_delete_url($snapshot)) ?>" title="" class="delete"><?php echo __('Delete', 'lime-export') ?></a></span>
 								</div>
 							</td>
 

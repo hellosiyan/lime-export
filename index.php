@@ -91,49 +91,74 @@ function wple_show_notices() {
 
 function wple_admin_init() {
 	try {
-		if ( isset($_POST['wple_download']) && check_admin_referer('wple_download','wple_download') ) {
-				wple_do_export();
-		} elseif ( isset($_GET['download']) ) {
-			$snapshots = wple_get_snapshots();
-
-			foreach ($snapshots as $snapshot) {
-				if ( $_GET['download'] == $snapshot['filename'] ) {
-					wple_do_snapshot_download($snapshot['filename'], 'dump_' . date('Ymd_His', $snapshot['created']) . '.sql');
-					exit();
-				}
-			}
-			throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
-		} elseif ( isset($_GET['delete']) ) {
-			$snapshots = wple_get_snapshots();
-
-			foreach ($snapshots as $snapshot) {
-				if ( $_GET['delete'] == $snapshot['filename'] ) {
-					wple_remove_snapshot($snapshot['filename']);
-					wp_redirect( remove_query_arg('delete') );
-				}
-			}
-			throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
-		} elseif( isset($_POST['action']) && $_POST['action'] == 'delete' && check_admin_referer('wple_snapshot', 'wple_snapshot') ) {
-			if ( empty( $_POST['checked'] ) ) {
-				throw new WPLE_Exception(WPLE_MSG_NO_SELECTION);
-			}
-
-			$snapshots = wple_get_snapshots();
-
-			foreach ($snapshots as $snapshot) {
-				if ( in_array($snapshot['filename'], $_POST['checked']) ) {
-					wple_remove_snapshot($snapshot['filename']);
-				}
-			}
+		if ( isset($_POST['wple_export']) ) {
+			wple_admin_handle_export();
+		} elseif ( isset($_GET['wple-download']) ) {
+			wple_admin_handle_snapshot_download($_GET['wple-download']);
+			exit();
+		} elseif ( isset($_GET['wple-delete']) ) {
+			wple_admin_handle_snapshot_delete($_GET['wple-delete']);
+			wp_redirect( remove_query_arg('wple-delete') );
+		} elseif( isset($_POST['wple-action']) && $_POST['wple-action'] == 'delete' ) {
+			wple_admin_handle_snapshot_delete_bulk();
 			wp_redirect( add_query_arg() );
 		}
 	} catch (WPLE_Exception $e) {
 		$_GET['message'] = $e->getErrNum();
 	}
 
-
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css');
 	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/functions.js');
+}
+
+function wple_admin_handle_export() {
+	check_admin_referer( 'wple_export', 'wple_export' );
+	wple_do_export();
+}
+
+function wple_admin_handle_snapshot_download($snapshot_filename) {
+	check_admin_referer( 'wple_download-snapshot_' . $snapshot_filename );
+
+	$snapshots = wple_get_snapshots();
+
+	foreach ($snapshots as $snapshot) {
+		if ( $snapshot_filename == $snapshot['filename'] ) {
+			wple_do_snapshot_download($snapshot['filename'], 'dump_' . date('Ymd_His', $snapshot['created']) . '.sql');
+		}
+	}
+
+	throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+}
+
+function wple_admin_handle_snapshot_delete($snapshot_filename) {
+	check_admin_referer( 'wple_delete-snapshot_' . $snapshot_filename );
+
+	$snapshots = wple_get_snapshots();
+
+	foreach ($snapshots as $snapshot) {
+		if ( $snapshot_filename == $snapshot['filename'] ) {
+			wple_remove_snapshot($snapshot['filename']);
+			return;
+		}
+	}
+
+	throw new WPLE_Exception(WPLE_MSG_SNAPSHOT_NOT_FOUND);
+}
+
+function wple_admin_handle_snapshot_delete_bulk() {
+	check_admin_referer( 'wple_snapshot-action', 'wple_snapshot-action' );
+
+	if ( empty( $_POST['checked'] ) ) {
+		throw new WPLE_Exception(WPLE_MSG_NO_SELECTION);
+	}
+
+	$snapshots = wple_get_snapshots();
+
+	foreach ($snapshots as $snapshot) {
+		if ( in_array($snapshot['filename'], $_POST['checked']) ) {
+			wple_remove_snapshot($snapshot['filename']);
+		}
+	}
 }
 
 function wple_admin_page_export() {
