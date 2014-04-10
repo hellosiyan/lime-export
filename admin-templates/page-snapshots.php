@@ -1,3 +1,10 @@
+<?php 
+// Block direct includes
+if ( !defined('WPINC') ) {
+	header("HTTP/1.0 404 Not Found");
+	exit;
+}
+?>
 <div class="wrap">
 	<div id="icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">

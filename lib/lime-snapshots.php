@@ -1,5 +1,11 @@
 <?php  
 
+// Block direct includes
+if ( !defined('WPINC') ) {
+	header("HTTP/1.0 404 Not Found");
+	exit;
+}
+
 function wple_get_snapshots() {
 	$snapshots = array();
 	$dir = wple_snapshot_dir() . '/';

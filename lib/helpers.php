@@ -1,5 +1,11 @@
 <?php 
 
+// Block direct includes
+if ( !defined('WPINC') ) {
+	header("HTTP/1.0 404 Not Found");
+	exit;
+}
+
 function wple_snapshot_dir() {
 	$upload_dir = wp_upload_dir();
 	$upload_dir = $upload_dir['basedir'] . '/wple-snapshots';
