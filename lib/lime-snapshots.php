@@ -73,7 +73,7 @@ function wple_do_snapshot_download( $filename, $nice_filename ) {
 function wple_get_snapshots() {
 	$snapshots = array();
 	$dir = wple_snapshot_dir() . '/';
-	$csv_filename = $dir . 'list.csv';
+	$csv_filename = wple_snapshot_list_file();
 
 	$csv = fopen($csv_filename, 'r');
 	if ( !$csv ) {
@@ -104,7 +104,7 @@ function wple_add_snapshot( $filename, $tables, $time = null ) {
 	$time = !$time ? time(): $time;
 
 	$dir = wple_snapshot_dir() . '/';
-	$csv_filename = $dir . 'list.csv';
+	$csv_filename = wple_snapshot_list_file();
 
 	$csv = fopen($csv_filename, 'a');
 	if ( !$csv ) {
@@ -122,15 +122,18 @@ function wple_remove_snapshot( $filename ) {
 	$snapshots = wple_get_snapshots();
 
 	$dir = wple_snapshot_dir() . '/';
-	$csv_filename = $dir . 'list.csv';
+	$csv_filename = wple_snapshot_list_file();
 
-	$csv = fopen($dir . 'list.csv', 'w');
+	$csv = fopen($csv_filename, 'w');
 	if ( !$csv ) {
 		throw new WPLE_Exception( sprintf(
 			__('Cannot open file <code>%s</code>', 'lime-export'), 
 			str_replace(ABSPATH, '/', $csv_filename)
 		));
 	}
+
+	// Put back header
+	fwrite($csv, "<?php exit(); ?>\n");
 
 	foreach ($snapshots as $snapshot) {
 		if ( $snapshot['filename'] == $filename ) {
@@ -168,6 +171,10 @@ function wple_snapshot_dir() {
 	return $upload_dir;
 }
 
+function wple_snapshot_list_file() {
+	return wple_snapshot_dir() . '/list.php';
+}
+
 function wple_create_snapshot_dir() {
 	$upload_dir = wple_snapshot_dir();
 
@@ -181,15 +188,16 @@ function wple_create_snapshot_dir() {
 		}
 	}
 
-	if ( !file_exists($upload_dir . '/list.csv') ) {
-		touch($upload_dir . '/list.csv');
-		chmod($upload_dir . '/list.csv', 0640);
+	$list_filename = wple_snapshot_list_file();
+	if ( !file_exists($list_filename) ) {
+		file_put_contents($list_filename, "<?php exit(); ?>\n");
+		chmod($list_filename, 0640);
 	}
 	
-	
-	if ( !file_exists($upload_dir . '/index.html') ) {
-		touch($upload_dir . '/index.html');
-		chmod($upload_dir . '/index.html', 0640);
+	$index_filename = $upload_dir . '/index.html';
+	if ( !file_exists($index_filename) ) {
+		touch($index_filename);
+		chmod($index_filename, 0640);
 	}
 }
 

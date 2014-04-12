@@ -180,9 +180,6 @@ function wple_do_export() {
 	}
 
 	$config = wple_export_config();
-	$nice_filename = 'dump_' . date('Ymd_His') . '.sql';
-
-	$filename = md5(date('r')) . '.php';
 
 	$export_tables = $_POST['wple_export_tables'];
 	$existing_tables = wple_get_existing_tables();
@@ -239,9 +236,10 @@ function wple_do_export() {
 	$wpdb->query('SET time_zone = "' . $old_tz . '"');
 
 	if ( isset( $_POST['wple_save_snapshot'] ) ) {
-		wple_do_export_snapshot($filename, $export_tables);
+		wple_do_export_snapshot($export_tables);
 		fclose($wple_export_file);
 	} else {
+		$nice_filename = 'dump_' . date('Ymd_His') . '.sql';
 		wple_do_export_download($nice_filename);
 		exit();	
 	}
@@ -274,16 +272,22 @@ function wple_do_export_download( $filename ) {
 	return true;
 }
 
-function wple_do_export_snapshot( $filename, $export_tables ) {
+function wple_do_export_snapshot( $export_tables ) {
 	global $wple_export_file;
 
+	$basename = rand(100, 999) . sha1(date('r'));
+	$filename = $basename . '.php';
+
 	$dir = wple_snapshot_dir() . '/';
-	$basename = preg_replace('~\.php$~', '', $filename);
+	
 	$copy_counter = 1;
 	while ( is_file($dir . $filename) ) {
 		$filename = $basename . '_(' . $copy_counter . ').php';
 		$copy_counter ++;
 	}
+
+	touch($dir . $filename);
+	chmod($dir . $filename, 0640);
 
 	$snaphot_file = fopen($dir . $filename, 'w');
 	if ( !$snaphot_file ) {
