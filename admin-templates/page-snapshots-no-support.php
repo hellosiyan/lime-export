@@ -17,5 +17,13 @@ if ( !defined('WPINC') ) {
 			<span>Writable directory</span>
 		</dt>
 		<dd>Snapshots are saved in <code><?php echo str_replace(ABSPATH, '/', wple_snapshot_dir()); ?></code> and it must be writable</dd>
+
+		<dt <?php if(wple_is_snapshot_dir_secure()) echo 'class="wple-enabled"'; ?>>
+			<span>Secure directory</span>
+		</dt>
+		<dd>
+			File permissions for <code><?php echo str_replace(ABSPATH, '/', wple_snapshot_dir()); ?></code> must be  <code>0740</code> or less.<br/>
+			There must be an empty <code>index.html</code> file.
+		</dd>
 	</dl>
 </div>

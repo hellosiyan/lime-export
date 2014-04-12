@@ -6,43 +6,6 @@ if ( !defined('WPINC') ) {
 	exit;
 }
 
-function wple_snapshot_dir() {
-	$upload_dir = wp_upload_dir();
-	$upload_dir = $upload_dir['basedir'] . '/wple-snapshots';
-	
-	return $upload_dir;
-}
-
-function wple_create_snapshot_dir() {
-	$upload_dir = wple_snapshot_dir();
-
-	if ( !wple_supports_snapshots() ) {
-		throw new WPLE_Exception( __('Snapshots are not supported.', 'lime-export') );
-	}
-
-	if ( !is_dir( $upload_dir ) ) {
-		if ( !@mkdir($upload_dir, 0777, true) ) {
-			throw new WPLE_Exception( sprintf(
-				__('Unable to create directory <code>%s</code>. Is its parent directory writable by the server?', 'lime-export'),
-				str_replace(ABSPATH, '/', $upload_dir)
-			));
-		}
-
-		touch($upload_dir . '/list.csv');
-		
-		// create dummy index.php
-		$index = fopen($upload_dir . '/index.php', 'w');
-		if ( !$index ) {
-			throw new WPLE_Exception( sprintf(
-				__('Cannot open file <code>%s</code>', 'lime-export'), 
-				str_replace(ABSPATH, '/', $upload_dir . '/index.php')
-			));
-		}
-		fwrite($index, "<?php");
-		fclose( $index );
-	}
-}
-
 function wple_add_admin_notice($notice) {
 	global $wple_admin_notices;
 

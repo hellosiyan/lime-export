@@ -46,6 +46,7 @@ function wple_init() {
 	# Create required directory structure
 	try {
 		wple_create_snapshot_dir();
+		wple_check_support();
 	} catch (WPLE_Exception $e) {
 		wple_add_admin_notice($e->getMessage());
 	}
@@ -148,6 +149,12 @@ function wple_admin_handle_snapshot_delete_bulk() {
 		if ( in_array($snapshot['filename'], $_POST['checked']) ) {
 			wple_remove_snapshot($snapshot['filename']);
 		}
+	}
+}
+
+function wple_check_support() {
+	if ( !wple_supports_snapshots() ) {
+		throw new WPLE_Exception( __('Snapshots are not supported.', 'lime-export') );
 	}
 }
 

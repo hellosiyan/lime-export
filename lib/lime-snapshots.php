@@ -10,6 +10,11 @@ function wple_supports_snapshots() {
 	if ( !is_writable(wple_snapshot_dir()) ) {
 		return false;
 	}
+
+	if ( !wple_is_snapshot_dir_secure() ) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -154,4 +159,51 @@ function wple_get_snapshot_download_url($snapshot) {
 	$complete_url = wp_nonce_url( $bare_url, 'wple_download-snapshot_' . $snapshot['filename'] );
 
 	return $complete_url;
+}
+
+function wple_snapshot_dir() {
+	$upload_dir = wp_upload_dir();
+	$upload_dir = $upload_dir['basedir'] . '/wple-snapshots';
+	
+	return $upload_dir;
+}
+
+function wple_create_snapshot_dir() {
+	$upload_dir = wple_snapshot_dir();
+
+	if ( !is_dir( $upload_dir ) ) {
+		$success = @mkdir($upload_dir, 0750, true);
+		if ( !$success ) {
+			throw new WPLE_Exception( sprintf(
+				__('Unable to create directory <code>%s</code>. Is its parent directory writable by the server?', 'lime-export'),
+				str_replace(ABSPATH, '/', $upload_dir)
+			));
+		}
+	}
+
+	if ( !file_exists($upload_dir . '/list.csv') ) {
+		touch($upload_dir . '/list.csv');
+		chmod($upload_dir . '/list.csv', 0640);
+	}
+	
+	
+	if ( !file_exists($upload_dir . '/index.html') ) {
+		touch($upload_dir . '/index.html');
+		chmod($upload_dir . '/index.html', 0640);
+	}
+}
+
+function wple_is_snapshot_dir_secure() {
+	$dir = wple_snapshot_dir();
+	$dir_perms = fileperms($dir);
+
+	if ( ($dir_perms & 0x0007) != 0 ) {
+		return false;
+	}
+
+	if ( !file_exists($dir . '/index.html') ) {
+		return false;
+	}
+
+	return true;
 }
