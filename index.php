@@ -43,14 +43,6 @@ include_once('lib/lime-snapshots.php');
 add_action( 'init', 'wple_init' );
 
 function wple_init() {
-	# Create required directory structure
-	try {
-		wple_create_snapshot_dir();
-		wple_check_support();
-	} catch (WPLE_Exception $e) {
-		wple_add_admin_notice($e->getMessage());
-	}
-
 	# Register hooks
 	add_action( 'admin_notices', 'wple_show_notices' );
 	add_action( 'admin_menu', 'wple_register_pages' );
@@ -82,9 +74,16 @@ function wple_show_notices() {
 
 function wple_admin_init() {
 	try {
+		// Export handles
 		if ( isset($_POST['wple_export']) ) {
 			wple_admin_handle_export();
-		} elseif ( isset($_GET['wple-download']) ) {
+		}
+
+		wple_create_snapshot_dir();
+		wple_check_support();
+
+		// Snapshot handles
+		if ( isset($_GET['wple-download']) ) {
 			wple_admin_handle_snapshot_download($_GET['wple-download']);
 			exit();
 		} elseif ( isset($_GET['wple-delete']) ) {
@@ -235,7 +234,7 @@ function wple_do_export() {
 
 	$wpdb->query('SET time_zone = "' . $old_tz . '"');
 
-	if ( isset( $_POST['wple_save_snapshot'] ) ) {
+	if ( isset( $_POST['wple_save_snapshot'] ) && wple_supports_snapshots() ) {
 		wple_do_export_snapshot($export_tables);
 		fclose($wple_export_file);
 	} else {
