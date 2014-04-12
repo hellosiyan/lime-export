@@ -11,3 +11,7 @@
 .wp-list-table.wple-snapshots .snapshot-description ul li { margin-bottom: 0; }
 .wp-list-table.wple-snapshots .column-name span { float: left; }
 .wp-list-table.wple-snapshots .column-name span.sorting-indicator { display: block; position: static; width: 7px; height: 4px; margin-top: 8px; margin-left: 7px; background-image: url(../../../../wp-admin/images/sort.gif); background-repeat: no-repeat; }
+
+.wple-support-list dt span { padding: 2px 8px; border-radius: 3px; font-weight: bold; color: #fff; background: #a00; }
+.wple-support-list dt.wple-enabled span { background: #57ac18; }
+.wple-support-list dd { margin: 5px 8px 20px; }

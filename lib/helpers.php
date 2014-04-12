@@ -16,11 +16,11 @@ function wple_snapshot_dir() {
 function wple_create_snapshot_dir() {
 	$upload_dir = wple_snapshot_dir();
 
-	if ( !is_dir( $upload_dir ) ) {
-		if ( !preg_match('~apache~i', $_SERVER['SERVER_SOFTWARE']) ) {
-			throw new WPLE_Exception( __('This feature requires Apache Web Server.', 'lime-export') );
-		}
+	if ( !wple_supports_snapshots() ) {
+		throw new WPLE_Exception( __('Snapshots are not supported.', 'lime-export') );
+	}
 
+	if ( !is_dir( $upload_dir ) ) {
 		if ( !@mkdir($upload_dir, 0777, true) ) {
 			throw new WPLE_Exception( sprintf(
 				__('Unable to create directory <code>%s</code>. Is its parent directory writable by the server?', 'lime-export'),

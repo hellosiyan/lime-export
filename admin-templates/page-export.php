@@ -8,7 +8,7 @@ if ( !defined('WPINC') ) {
 <div class="wrap">
 	<div id="icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
-		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots', 'lime-export'); ?></a>
+		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Export Database', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
 	<form action="" method="post" id="export-filters">
@@ -60,7 +60,9 @@ if ( !defined('WPINC') ) {
 
 		<p class="submit">
 			<input type="submit" name="submit" id="submit" class="button-primary" value="<?php echo __('Download Export File', 'lime-export') ?>">
-			<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php echo __('Save as Snapshot', 'lime-export') ?>">
+			<?php if ( wple_supports_snapshots() ): ?>
+				<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php echo __('Save as Snapshot', 'lime-export') ?>">
+			<?php endif ?>
 		</p>
 	</form>
 </div>

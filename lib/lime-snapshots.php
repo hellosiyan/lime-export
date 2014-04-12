@@ -6,8 +6,20 @@ if ( !defined('WPINC') ) {
 	exit;
 }
 
+function wple_supports_snapshots() {
+	if ( !is_writable(wple_snapshot_dir()) ) {
+		return false;
+	}
+	return true;
+}
+
 function wple_admin_page_snapshots() {
 	global $wpdb;
+
+	if ( !wple_supports_snapshots() ) {
+		include(WPLE_PATH . '/admin-templates/page-snapshots-no-support.php');
+		return;
+	}
 
 	try {
 		$snapshots = wple_get_snapshots();
