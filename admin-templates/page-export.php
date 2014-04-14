@@ -6,23 +6,23 @@ if ( !defined('WPINC') ) {
 }
 ?>
 <div class="wrap">
-	<div id="icon-lime-export" class="icon32"><br></div>
+	<div id="wple-icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
 		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Export Database', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
-	<form action="" method="post" id="export-filters">
+	<form action="" method="post" id="wple-export-filters">
 		<?php wp_nonce_field('wple_export','wple_export'); ?>
 	
 		<p>
 			<label><input type="radio" name="wple_preset" value="standard" <?php echo wple_get_checked('wple_preset', 'checked="checked"', 'standard') ?> /> <?php echo __('Standard export', 'lime-export'); ?></label>
-			<span class="description"><?php echo __('structure and data, no <code>DROP TABLE</code> statement', 'lime-export'); ?></span>
+			<span class="wple-description"><?php echo __('structure and data, no <code>DROP TABLE</code> statement', 'lime-export'); ?></span>
 		</p>
 		<p>
 			<label><input type="radio" name="wple_preset" value="custom" <?php echo wple_get_checked('wple_preset', '', 'custom') ?> /> <?php echo __('Custom settings', 'lime-export'); ?></label>
 		</p>
 
-		<ul class="export-settings">
+		<ul class="wple-export-settings">
 			<li>
 				<label><?php echo __('Include table', 'lime-export'); ?>:</label>
 				<select name="wple_dump_format">

@@ -1,16 +1,16 @@
 jQuery(function($) {
-	var form = $('form#export-filters');
+	var form = $('form#wple-export-filters');
 
 	// Export Page
 	if ( form.length > 0 ) {(function(){
 		$('input:radio[name=wple_preset]', form).change(function() {
 			if ( $(this).val() == 'standard' ) {
-				$('.export-settings', form).slideUp();
+				$('.wple-export-settings', form).slideUp();
 			} else {
-				$('.export-settings', form).slideDown();
+				$('.wple-export-settings', form).slideDown();
 			}
 		}).filter(':checked').each(function() {
-			$('.export-settings', form).toggle( $(this).val() != 'standard' );
+			$('.wple-export-settings', form).toggle( $(this).val() != 'standard' );
 		});
 
 		$('.tables-list li input:checkbox', form).change(function() {
@@ -62,7 +62,7 @@ jQuery(function($) {
 
 	// Snapshots page
 	if ( $('.wple-snapshots').length > 0 ) {(function(){
-		$('.snapshot-description').each(function() {
+		$('.wple-snapshot-description').each(function() {
 			var $th = $(this),
 				tables = $th.find('ul:first');
 			
@@ -80,8 +80,8 @@ jQuery(function($) {
 			};
 		});
 
-		$('.snapshot-title .delete a').click(function() {
-			return confirm('DELETE snapshot ' + $(this).closest('.snapshot-title').find('strong:first').text() + '?');
+		$('.wple-snapshot-title .delete a').click(function() {
+			return confirm('DELETE snapshot ' + $(this).closest('.wple-snapshot-title').find('strong:first').text() + '?');
 		});
 
 		$('#doaction').click(function() {

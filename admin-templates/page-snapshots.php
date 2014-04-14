@@ -6,7 +6,7 @@ if ( !defined('WPINC') ) {
 }
 ?>
 <div class="wrap">
-	<div id="icon-lime-export" class="icon32"><br></div>
+	<div id="wple-icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
 		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php echo __('View Snapshots', 'lime-export'); ?></a>
 	</h2>
@@ -61,7 +61,7 @@ if ( !defined('WPINC') ) {
 								<label class="screen-reader-text" for="123"><?php echo $snapshot['filename'] ?></label>
 							</th>
 
-							<td class="snapshot-title">
+							<td class="wple-snapshot-title">
 								<strong title="<?php echo date('r', $snapshot['created']) ?>"><?php echo date($date_format, $snapshot['created']) ?></strong><br/>
 								<em><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></em>
 								<div class="row-actions">
@@ -71,7 +71,7 @@ if ( !defined('WPINC') ) {
 							</td>
 
 							<td class="column-description desc">
-								<div class="snapshot-description">
+								<div class="wple-snapshot-description">
 									<p>
 										<strong><?php echo __('Size', 'lime-export') ?></strong>: <?php echo $snapshot['size']; ?><br/>
 										<strong><?php echo __('Tables', 'lime-export') ?></strong>: 

@@ -69,7 +69,7 @@ function wple_show_notices() {
 		return;
 	}
 
-	echo '<div id="message" class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $notices) . '</p></div>';
+	echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $notices) . '</p></div>';
 }
 
 function wple_admin_init() {
@@ -97,8 +97,8 @@ function wple_admin_init() {
 		wple_add_admin_notice($e->getMessage());
 	}
 
-	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css');
-	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/functions.js');
+	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css', array(), WPLE_VERSION);
+	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/functions.js', array(), WPLE_VERSION);
 }
 
 function wple_admin_handle_export() {

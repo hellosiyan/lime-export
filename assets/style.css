@@ -1,14 +1,14 @@
-#icon-lime-export { background: url(icon.png) no-repeat 0 0; display: block; width: 36px; height: 34px; float: left; margin-right: 10px; }
-#export-filters {}
-#export-filters code { background: transparent; font-style: normal; }
-#export-filters .export-settings { margin: 0 0 18px 18px; }
-#export-filters .export-settings label { cursor: default; }
-#export-filters .tables-list { margin-left: 10px; }
-#export-filters .tables-list li { color: #000; }
-#export-filters .tables-list li label { font-family: monospace; user-select: none; -webkit-user-select: none; -moz-user-select: -moz-none; }
-#export-filters .tables-list li.inactive { color: #999; }
+#wple-icon-lime-export { background: url(icon.png) no-repeat 0 0; display: block; width: 36px; height: 34px; float: left; margin-right: 10px; }
+#wple-export-filters {}
+#wple-export-filters code { background: transparent; font-style: normal; }
+#wple-export-filters .wple-export-settings { margin: 0 0 18px 18px; }
+#wple-export-filters .wple-export-settings label { cursor: default; }
+#wple-export-filters .tables-list { margin-left: 10px; }
+#wple-export-filters .tables-list li { color: #000; }
+#wple-export-filters .tables-list li label { font-family: monospace; user-select: none; -webkit-user-select: none; -moz-user-select: -moz-none; }
+#wple-export-filters .tables-list li.inactive { color: #999; }
 
-.wp-list-table.wple-snapshots .snapshot-description ul li { margin-bottom: 0; }
+.wp-list-table.wple-snapshots .wple-snapshot-description ul li { margin-bottom: 0; }
 .wp-list-table.wple-snapshots .column-name span { float: left; }
 .wp-list-table.wple-snapshots .column-name span.sorting-indicator { display: block; position: static; width: 7px; height: 4px; margin-top: 8px; margin-left: 7px; background-image: url(../../../../wp-admin/images/sort.gif); background-repeat: no-repeat; }
 
