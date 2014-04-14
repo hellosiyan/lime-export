@@ -92,7 +92,7 @@ function wple_get_snapshots() {
 			'filename' => $data[0],
 			'tables' => explode('|', $data[1]),
 			'created' => intval($data[2]),
-			'size' => wple_format_bytes(intval($data[3])),
+			'size' => intval($data[3]),
 		);
 	}
 
@@ -101,9 +101,20 @@ function wple_get_snapshots() {
 }
 
 function wple_add_snapshot( $filename, $tables, $time = null ) {
-	$time = !$time ? time(): $time;
-
 	$dir = wple_snapshot_dir() . '/';
+
+	wple_add_multiple_snapshots(array(
+		array(
+			'filename' => $filename,
+			'tables' => $tables,
+			'created' => intval(!$time ? time(): $time),
+			'size' => filesize($dir . $filename),
+		)
+	));
+}
+
+
+function wple_add_multiple_snapshots( $snapshots ) {
 	$csv_filename = wple_snapshot_list_file();
 
 	$csv = fopen($csv_filename, 'a');
@@ -114,7 +125,15 @@ function wple_add_snapshot( $filename, $tables, $time = null ) {
 		));
 	}
 
-	fputcsv($csv, array($filename, implode('|', $tables), $time, filesize($dir . $filename)) );
+	foreach ($snapshots as $snapshot) {
+		fputcsv($csv, array(
+			$snapshot['filename'],
+			implode('|', $snapshot['tables']),
+			$snapshot['created'],
+			$snapshot['size']
+		));
+	}
+	
 	fclose($csv);
 }
 

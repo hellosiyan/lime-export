@@ -34,6 +34,8 @@ define('WPLE_VERSION', '0.4');
 
 add_action( 'init', 'wple_init' );
 
+register_activation_hook( __FILE__, 'wple_upgrade' );
+
 function wple_init() {
 	# Register hooks
 	add_action( 'admin_menu', 'wple_register_pages' );
@@ -54,20 +56,7 @@ function wple_register_pages() {
 }
 
 function wple_admin_init() {
-	if ( !defined('WP_ADMIN') ) {
-		return;
-	}
-
-	define('WPLE_PATH', dirname(__FILE__));
-	define('WPLE_URL', WP_PLUGIN_URL . '/' . basename(WPLE_PATH) );
-
-	define('WPLE_MAX_QUERY_SIZE', 50000);
-
-	include_once(WPLE_PATH . '/lib/helpers.php');
-	include_once(WPLE_PATH . '/lib/lime-export.php');
-	include_once(WPLE_PATH . '/lib/lime-snapshots.php');
-	
-	add_action( 'admin_notices', 'wple_show_notices' );
+	wple_load();
 
 	try {
 		wple_admin_handle_export();
@@ -89,4 +78,29 @@ function wple_admin_init() {
 
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css', array(), WPLE_VERSION);
 	wp_enqueue_script('lemon-export-script', WPLE_URL . '/assets/functions.js', array(), WPLE_VERSION);
+}
+
+function wple_upgrade() {
+	wple_load();
+	include_once(WPLE_PATH . '/upgrade/lime-export-1.0.php');
+
+	wple_upgrade_to_1_0();
+}
+
+
+function wple_load() {
+	if ( !defined('WP_ADMIN') || defined('WPLE_PATH') ) {
+		return;
+	}
+
+	define('WPLE_PATH', dirname(__FILE__));
+	define('WPLE_URL', WP_PLUGIN_URL . '/' . basename(WPLE_PATH) );
+
+	define('WPLE_MAX_QUERY_SIZE', 50000);
+
+	include_once(WPLE_PATH . '/lib/helpers.php');
+	include_once(WPLE_PATH . '/lib/lime-export.php');
+	include_once(WPLE_PATH . '/lib/lime-snapshots.php');
+
+	add_action( 'admin_notices', 'wple_show_notices' );
 }

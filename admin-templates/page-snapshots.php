@@ -73,7 +73,7 @@ if ( !defined('WPINC') ) {
 							<td class="column-description desc">
 								<div class="wple-snapshot-description">
 									<p>
-										<strong><?php echo __('Size', 'lime-export') ?></strong>: <?php echo $snapshot['size']; ?><br/>
+										<strong><?php echo __('Size', 'lime-export') ?></strong>: <?php echo wple_format_bytes($snapshot['size']); ?><br/>
 										<strong><?php echo __('Tables', 'lime-export') ?></strong>: 
 									</p>
 									<ul>
