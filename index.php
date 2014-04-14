@@ -69,32 +69,32 @@ function wple_show_notices() {
 		return;
 	}
 
-	echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . implode('</p><p>', $notices) . '</p></div>';
+	foreach ($notices['error'] as $error_notice) {
+		echo '<div class="error fade"><p><strong>Database Export:</strong> ' . $error_notice . '</p></div>';
+	}
+
+	foreach ($notices['info'] as $info_notice) {
+		echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . $info_notice . '</p></div>';
+	}
 }
 
 function wple_admin_init() {
 	try {
-		// Export handles
-		if ( isset($_POST['wple_export']) ) {
-			wple_admin_handle_export();
-		}
+		wple_admin_handle_export();
 
 		wple_create_snapshot_dir();
-		wple_check_support();
 
-		// Snapshot handles
-		if ( isset($_GET['wple-download']) ) {
-			wple_admin_handle_snapshot_download($_GET['wple-download']);
-			exit();
-		} elseif ( isset($_GET['wple-delete']) ) {
-			wple_admin_handle_snapshot_delete($_GET['wple-delete']);
-			wp_redirect( remove_query_arg('wple-delete') );
-		} elseif( isset($_POST['wple-action']) && $_POST['wple-action'] == 'delete' ) {
+		if ( wple_supports_snapshots() ) {
+			wple_admin_handle_snapshot_download();
+			wple_admin_handle_snapshot_delete();
 			wple_admin_handle_snapshot_delete_bulk();
-			wp_redirect( add_query_arg() );
 		}
 	} catch (WPLE_Exception $e) {
-		wple_add_admin_notice($e->getMessage());
+		wple_add_admin_notice($e->getMessage(), 'error');
+	}
+
+	if ( !wple_supports_snapshots() ) {
+		wple_add_admin_notice(__('Snapshots are not supported.', 'lime-export'));
 	}
 
 	wp_enqueue_style('lemon-export-style', WPLE_URL . '/assets/style.css', array(), WPLE_VERSION);
@@ -102,11 +102,20 @@ function wple_admin_init() {
 }
 
 function wple_admin_handle_export() {
+	if ( !isset($_POST['wple_export']) ) {
+		return;
+	}
+
 	check_admin_referer( 'wple_export', 'wple_export' );
 	wple_do_export();
 }
 
-function wple_admin_handle_snapshot_download($snapshot_filename) {
+function wple_admin_handle_snapshot_download() {
+	if ( !isset($_GET['wple-download']) ) {
+		return;
+	}
+
+	$snapshot_filename = sanitize_file_name($_GET['wple-download']);
 	check_admin_referer( 'wple_download-snapshot_' . $snapshot_filename );
 
 	$snapshots = wple_get_snapshots();
@@ -114,13 +123,19 @@ function wple_admin_handle_snapshot_download($snapshot_filename) {
 	foreach ($snapshots as $snapshot) {
 		if ( $snapshot_filename == $snapshot['filename'] ) {
 			wple_do_snapshot_download($snapshot['filename'], 'dump_' . date('Ymd_His', $snapshot['created']) . '.sql');
+			exit();
 		}
 	}
 
 	throw new WPLE_Exception( __('The snapshot you requested is missing', 'lime-export') );
 }
 
-function wple_admin_handle_snapshot_delete($snapshot_filename) {
+function wple_admin_handle_snapshot_delete() {
+	if ( !isset($_GET['wple-delete']) ) {
+		return;
+	}
+
+	$snapshot_filename = sanitize_file_name($_GET['wple-delete']);
 	check_admin_referer( 'wple_delete-snapshot_' . $snapshot_filename );
 
 	$snapshots = wple_get_snapshots();
@@ -128,7 +143,8 @@ function wple_admin_handle_snapshot_delete($snapshot_filename) {
 	foreach ($snapshots as $snapshot) {
 		if ( $snapshot_filename == $snapshot['filename'] ) {
 			wple_remove_snapshot($snapshot['filename']);
-			return;
+			wp_redirect( remove_query_arg('wple-delete') );
+			exit;
 		}
 	}
 
@@ -136,6 +152,10 @@ function wple_admin_handle_snapshot_delete($snapshot_filename) {
 }
 
 function wple_admin_handle_snapshot_delete_bulk() {
+	if( ! (isset($_POST['wple-action']) && $_POST['wple-action'] == 'delete') ) {
+		return;
+	}
+
 	check_admin_referer( 'wple_snapshot-action', 'wple_snapshot-action' );
 
 	if ( empty( $_POST['checked'] ) ) {
@@ -147,13 +167,9 @@ function wple_admin_handle_snapshot_delete_bulk() {
 	foreach ($snapshots as $snapshot) {
 		if ( in_array($snapshot['filename'], $_POST['checked']) ) {
 			wple_remove_snapshot($snapshot['filename']);
+			wp_redirect( add_query_arg() );
+			exit;
 		}
-	}
-}
-
-function wple_check_support() {
-	if ( !wple_supports_snapshots() ) {
-		throw new WPLE_Exception( __('Snapshots are not supported.', 'lime-export') );
 	}
 }
 

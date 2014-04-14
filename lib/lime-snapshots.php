@@ -31,7 +31,7 @@ function wple_admin_page_snapshots() {
 	} catch (WPLE_Exception $e) {
 		$snapshots = array();
 
-		wple_add_admin_notice($e->getMessage());
+		wple_add_admin_notice($e->getMessage(), 'error');
 		do_action('admin_notices');
 	}
 	
@@ -182,7 +182,7 @@ function wple_create_snapshot_dir() {
 		$success = @mkdir($upload_dir, 0750, true);
 		if ( !$success ) {
 			throw new WPLE_Exception( sprintf(
-				__('Unable to create directory <code>%s</code>. Is its parent directory writable by the server?', 'lime-export'),
+				__('Unable to create directory <code>%s</code>', 'lime-export'),
 				str_replace(ABSPATH, '/', $upload_dir)
 			));
 		}

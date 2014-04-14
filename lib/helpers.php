@@ -6,21 +6,31 @@ if ( !defined('WPINC') ) {
 	exit;
 }
 
-function wple_add_admin_notice($notice) {
+function wple_add_admin_notice($notice, $notice_type = 'info') {
 	global $wple_admin_notices;
 
 	if ( !is_array($wple_admin_notices) ) {
-		$wple_admin_notices = array();
+		$wple_admin_notices = array(
+			'info' => array(), 
+			'error' => array()
+		);
+	}
+
+	if ( !in_array($notice_type, array('info', 'error')) ) {
+		$notice_type = 'info';
 	}
 	
-	$wple_admin_notices[] = $notice;
+	$wple_admin_notices[$notice_type][] = $notice;
 }
 
 function wple_get_admin_notices() {
 	global $wple_admin_notices;
 
 	if ( !is_array($wple_admin_notices) ) {
-		$wple_admin_notices = array();
+		$wple_admin_notices = array(
+			'info' => array(), 
+			'error' => array()
+		);
 	}
 
 	return $wple_admin_notices;
