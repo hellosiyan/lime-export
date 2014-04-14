@@ -36,6 +36,22 @@ function wple_get_admin_notices() {
 	return $wple_admin_notices;
 }
 
+function wple_show_notices() {
+	$notices = wple_get_admin_notices();
+
+	if ( empty($notices) ) {
+		return;
+	}
+
+	foreach ($notices['error'] as $error_notice) {
+		echo '<div class="error fade"><p><strong>Database Export:</strong> ' . $error_notice . '</p></div>';
+	}
+
+	foreach ($notices['info'] as $info_notice) {
+		echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . $info_notice . '</p></div>';
+	}
+}
+
 function wple_addslashes($str = '', $is_like = false, $line_endings = false) {
 	if ($is_like) {
 		$str = str_replace('\\', '\\\\\\\\', $str);
