@@ -8,7 +8,7 @@ if ( !defined('WPINC') ) {
 <div class="wrap">
 	<div id="wple-icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
-		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php echo __('View Snapshots', 'lime-export'); ?></a>
+		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php _e('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php _e('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
 	<form action="" method="post">
@@ -24,10 +24,10 @@ if ( !defined('WPINC') ) {
 		<div class="tablenav top">
 			<div class="alignleft actions">
 				<select name="wple-action">
-					<option value="-1" selected="selected"><?php echo __('Bulk Actions', 'lime-export') ?></option>
-					<option value="delete"><?php echo __('Delete', 'lime-export') ?></option>
+					<option value="-1" selected="selected"><?php _e('Bulk Actions', 'lime-export') ?></option>
+					<option value="delete"><?php _e('Delete', 'lime-export') ?></option>
 				</select>
-				<input type="submit" name="" id="doaction" class="button-secondary action" value="<?php echo __('Apply', 'lime-export') ?>">
+				<input type="submit" name="" id="doaction" class="button-secondary action" value="<?php _e('Apply', 'lime-export') ?>">
 			</div>
 		</div>
 
@@ -37,8 +37,8 @@ if ( !defined('WPINC') ) {
 					<th scope="col" id="cb" class="manage-column column-cb check-column" style="">
 						<input type="checkbox" />
 					</th>
-					<th scope="col" id="name" class="manage-column column-name" style=""><span><?php echo __('Filename', 'lime-export') ?></span><span class="sorting-indicator"></span></th>
-					<th scope="col" id="description" class="manage-column column-description" style=""><?php echo __('Description', 'lime-export') ?></th>	
+					<th scope="col" id="name" class="manage-column column-name" style=""><span><?php _e('Filename', 'lime-export') ?></span><span class="sorting-indicator"></span></th>
+					<th scope="col" id="description" class="manage-column column-description" style=""><?php _e('Description', 'lime-export') ?></th>	
 				</tr>
 			</thead>
 
@@ -47,8 +47,8 @@ if ( !defined('WPINC') ) {
 					<th scope="col" class="manage-column column-cb check-column" style="">
 						<input type="checkbox" />
 					</th>
-					<th scope="col" class="manage-column column-name" style=""><span><?php echo __('Filename', 'lime-export') ?></span><span class="sorting-indicator"></span></th>
-					<th scope="col" class="manage-column column-description" style=""><?php echo __('Description', 'lime-export') ?></th>
+					<th scope="col" class="manage-column column-name" style=""><span><?php _e('Filename', 'lime-export') ?></span><span class="sorting-indicator"></span></th>
+					<th scope="col" class="manage-column column-description" style=""><?php _e('Description', 'lime-export') ?></th>
 				</tr>
 			</tfoot>
 
@@ -65,16 +65,16 @@ if ( !defined('WPINC') ) {
 								<strong title="<?php echo date('r', $snapshot['created']) ?>"><?php echo date($date_format, $snapshot['created']) ?></strong><br/>
 								<em><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></em>
 								<div class="row-actions">
-									<span class="deactivate"><a href="<?php echo esc_attr(wple_get_snapshot_download_url($snapshot)) ?>" title=""><?php echo __('Download', 'lime-export') ?></a> | </span>
-									<span class="delete"><a href="<?php echo esc_attr(wple_get_snapshot_delete_url($snapshot)) ?>" title="" class="delete"><?php echo __('Delete', 'lime-export') ?></a></span>
+									<span class="deactivate"><a href="<?php echo esc_attr(wple_get_snapshot_download_url($snapshot)) ?>" title=""><?php _e('Download', 'lime-export') ?></a> | </span>
+									<span class="delete"><a href="<?php echo esc_attr(wple_get_snapshot_delete_url($snapshot)) ?>" title="" class="delete"><?php _e('Delete', 'lime-export') ?></a></span>
 								</div>
 							</td>
 
 							<td class="column-description desc">
 								<div class="wple-snapshot-description">
 									<p>
-										<strong><?php echo __('Size', 'lime-export') ?></strong>: <?php echo wple_format_bytes($snapshot['size']); ?><br/>
-										<strong><?php echo __('Tables', 'lime-export') ?></strong>: 
+										<strong><?php _e('Size', 'lime-export') ?></strong>: <?php echo wple_format_bytes($snapshot['size']); ?><br/>
+										<strong><?php _e('Tables', 'lime-export') ?></strong>: 
 									</p>
 									<ul>
 										<?php foreach ($snapshot['tables']  as $table): ?>
@@ -88,7 +88,7 @@ if ( !defined('WPINC') ) {
 				<?php else: ?>
 						<tr>
 							<td class="column-description desc" colspan="3">
-								<p><?php echo __('No snapshots found.', 'lime-export') ?></p>
+								<p><?php _e('No snapshots found.', 'lime-export') ?></p>
 							</td>
 						</tr>
 				<?php endif ?>

@@ -8,23 +8,23 @@ if ( !defined('WPINC') ) {
 <div class="wrap">
 	<div id="wple-icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
-		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php echo __('Export Database', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php echo __('View Snapshots', 'lime-export'); ?></a>
+		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab nav-tab-active"><?php _e('Export Database', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab"><?php _e('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
 	<form action="" method="post" id="wple-export-filters">
 		<?php wp_nonce_field('wple_export','wple_export'); ?>
 	
 		<p>
-			<label><input type="radio" name="wple_preset" value="standard" <?php echo wple_get_checked('wple_preset', 'checked="checked"', 'standard') ?> /> <?php echo __('Standard export', 'lime-export'); ?></label>
-			<span class="wple-description"><?php echo __('structure and data, no <code>DROP TABLE</code> statement', 'lime-export'); ?></span>
+			<label><input type="radio" name="wple_preset" value="standard" <?php echo wple_get_checked('wple_preset', 'checked="checked"', 'standard') ?> /> <?php _e('Standard export', 'lime-export'); ?></label>
+			<span class="wple-description"><?php _e('structure and data, no <code>DROP TABLE</code> statement', 'lime-export'); ?></span>
 		</p>
 		<p>
-			<label><input type="radio" name="wple_preset" value="custom" <?php echo wple_get_checked('wple_preset', '', 'custom') ?> /> <?php echo __('Custom settings', 'lime-export'); ?></label>
+			<label><input type="radio" name="wple_preset" value="custom" <?php echo wple_get_checked('wple_preset', '', 'custom') ?> /> <?php _e('Custom settings', 'lime-export'); ?></label>
 		</p>
 
 		<ul class="wple-export-settings">
 			<li>
-				<label><?php echo __('Include table', 'lime-export'); ?>:</label>
+				<label><?php _e('Include table', 'lime-export'); ?>:</label>
 				<select name="wple_dump_format">
 					<?php 
 					$current_format = wple_get_postval('wple_dump_format', 'both');
@@ -34,13 +34,13 @@ if ( !defined('WPINC') ) {
 				</select>
 			</li>
 			<li>
-				<label><?php echo __('Add <code>DROP TABLE</code> statement', 'lime-export'); ?>:</label>
+				<label><?php _e('Add <code>DROP TABLE</code> statement', 'lime-export'); ?>:</label>
 				<input type="checkbox" name="wple_dump_add_drop" value="1" <?php echo wple_get_checked('wple_dump_add_drop') ?>/>
 			</li>
 		</ul>
 
 
-		<h3><?php echo __('Choose which tables to export', 'lime-export') ?></h3>
+		<h3><?php _e('Choose which tables to export', 'lime-export') ?></h3>
 		<ul class="tables-list">
 			<?php foreach ($tables as $table): 
 				$table = preg_replace('~^' . preg_quote($wpdb->prefix) . '~', '', $table);
@@ -59,9 +59,9 @@ if ( !defined('WPINC') ) {
 		</ul>
 
 		<p class="submit">
-			<input type="submit" name="submit" id="submit" class="button-primary" value="<?php echo __('Download Export File', 'lime-export') ?>">
+			<input type="submit" name="submit" id="submit" class="button-primary" value="<?php _e('Download Export File', 'lime-export') ?>">
 			<?php if ( wple_supports_snapshots() ): ?>
-				<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php echo __('Save as Snapshot', 'lime-export') ?>">
+				<input type="submit" name="wple_save_snapshot" id="submit" class="button-secondary" value="<?php _e('Save as Snapshot', 'lime-export') ?>">
 			<?php endif ?>
 		</p>
 	</form>
