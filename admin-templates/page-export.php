@@ -29,7 +29,7 @@ if ( !defined('WPINC') ) {
 					<?php 
 					$current_format = wple_get_postval('wple_dump_format', 'both');
 					foreach ($formats as $format => $label): ?>
-						<option value="<?php echo $format ?>" <?php if($current_format==$format) echo 'selected="selected"'; ?>><?php echo $label; ?></option>
+						<option value="<?php echo esc_attr($format) ?>" <?php if($current_format==$format) echo 'selected="selected"'; ?>><?php echo esc_html($label); ?></option>
 					<?php endforeach ?>
 				</select>
 			</li>
@@ -48,7 +48,7 @@ if ( !defined('WPINC') ) {
 				$checked = wple_get_checked('wple_export_tables', ($is_standard?'checked="checked"':''), $table);
 			?>
 				<li <?php if($is_standard) echo 'class="standard"'; ?>><label>
-					<input type="checkbox" name="wple_export_tables[]" value="<?php echo $table ?>" <?php echo $checked; ?>>
+					<input type="checkbox" name="wple_export_tables[]" value="<?php echo esc_attr($table) ?>" <?php echo $checked; ?>>
 					<?php echo $table; ?>
 				</label></li>
 			<?php endforeach ?>

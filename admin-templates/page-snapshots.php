@@ -57,13 +57,13 @@ if ( !defined('WPINC') ) {
 					<?php foreach ($snapshots as $snapshot): ?>
 						<tr>
 							<th scope="row" class="check-column">
-								<input type="checkbox" name="checked[]" value="<?php echo $snapshot['filename'] ?>" id="123">
-								<label class="screen-reader-text" for="123"><?php echo $snapshot['filename'] ?></label>
+								<input type="checkbox" name="checked[]" value="<?php echo esc_attr($snapshot['filename']) ?>" id="123">
+								<label class="screen-reader-text" for="123"><?php echo esc_html($snapshot['filename']) ?></label>
 							</th>
 
 							<td class="wple-snapshot-title">
 								<strong title="<?php echo date('r', $snapshot['created']) ?>"><?php echo date($date_format, $snapshot['created']) ?></strong><br/>
-								<em><?php echo str_replace('.php', '.sql', $snapshot['filename']) ?></em>
+								<em><?php echo esc_html(str_replace('.php', '.sql', $snapshot['filename'])) ?></em>
 								<div class="row-actions">
 									<span class="deactivate"><a href="<?php echo esc_attr(wple_get_snapshot_download_url($snapshot)) ?>" title=""><?php _e('Download', 'lime-export') ?></a> | </span>
 									<span class="delete"><a href="<?php echo esc_attr(wple_get_snapshot_delete_url($snapshot)) ?>" title="" class="delete"><?php _e('Delete', 'lime-export') ?></a></span>
@@ -73,12 +73,12 @@ if ( !defined('WPINC') ) {
 							<td class="column-description desc">
 								<div class="wple-snapshot-description">
 									<p>
-										<strong><?php _e('Size', 'lime-export') ?></strong>: <?php echo wple_format_bytes($snapshot['size']); ?><br/>
+										<strong><?php _e('Size', 'lime-export') ?></strong>: <?php echo esc_html(wple_format_bytes($snapshot['size'])); ?><br/>
 										<strong><?php _e('Tables', 'lime-export') ?></strong>: 
 									</p>
 									<ul>
 										<?php foreach ($snapshot['tables']  as $table): ?>
-											<li><?php echo $table ?></li>
+											<li><?php echo esc_html($table) ?></li>
 										<?php endforeach ?>
 									</ul>
 								</div>

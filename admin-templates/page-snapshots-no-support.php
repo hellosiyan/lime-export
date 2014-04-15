@@ -8,7 +8,7 @@ if ( !defined('WPINC') ) {
 <div class="wrap">
 	<div id="wple-icon-lime-export" class="icon32"><br></div>
 	<h2 class="nav-tab-wrapper">
-		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php echo __('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php echo __('View Snapshots', 'lime-export'); ?></a>
+		<a href="<?php echo admin_url('tools.php?page=lime-export'); ?>" class="nav-tab"><?php _e('Database Export', 'lime-export'); ?></a><a href="<?php echo admin_url('tools.php?page=lime-snapshots'); ?>" class="nav-tab nav-tab-active"><?php _e('View Snapshots', 'lime-export'); ?></a>
 	</h2>
 
 	<h3><?php _e('Complete the following list to enable Snapshots', 'lime-export'); ?>:</h3>

@@ -44,11 +44,11 @@ function wple_show_notices() {
 	}
 
 	foreach ($notices['error'] as $error_notice) {
-		echo '<div class="error fade"><p><strong>Database Export:</strong> ' . $error_notice . '</p></div>';
+		echo '<div class="error fade"><p><strong>Database Export:</strong> ' . strip_tags($error_notice, '<code>') . '</p></div>';
 	}
 
 	foreach ($notices['info'] as $info_notice) {
-		echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . $info_notice . '</p></div>';
+		echo '<div class="updated fade"><p><strong>Database Export:</strong> ' . strip_tags($info_notice, '<code>') . '</p></div>';
 	}
 }
 
