@@ -211,6 +211,9 @@ function wple_create_snapshot_dir() {
 	if ( !file_exists($list_filename) ) {
 		file_put_contents($list_filename, "<?php exit(); ?>\n");
 		chmod($list_filename, 0640);
+
+		// Upgrading from 0.4 ?
+		wple_upgrade();
 	}
 	
 	$index_filename = $upload_dir . '/index.html';

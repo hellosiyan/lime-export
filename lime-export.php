@@ -81,6 +81,12 @@ function wple_admin_init() {
 }
 
 function wple_upgrade() {
+	if ( defined('WPLE_UPGRADING') ) {
+		return;
+	}
+
+	define('WPLE_UPGRADING', true);
+
 	wple_load();
 	include_once(WPLE_PATH . '/upgrade/lime-export-1.0.php');
 
