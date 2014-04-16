@@ -104,6 +104,7 @@ function wple_load() {
 
 	define('WPLE_MAX_QUERY_SIZE', 50000);
 
+	include_once(WPLE_PATH . '/lib/mysql-alias.php');
 	include_once(WPLE_PATH . '/lib/helpers.php');
 	include_once(WPLE_PATH . '/lib/lime-export.php');
 	include_once(WPLE_PATH . '/lib/lime-snapshots.php');

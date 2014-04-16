@@ -243,10 +243,10 @@ function wple_export_structure($table, $config) {
     }
 
     // Table status
-    $result = mysql_query('SHOW TABLE STATUS FROM `' . $wpdb->dbname . '` LIKE \'' . wple_addslashes($table) . '\'', $wpdb->dbh);
+    $result = lime_mysql_query('SHOW TABLE STATUS FROM `' . $wpdb->dbname . '` LIKE \'' . wple_addslashes($table) . '\'', $wpdb->dbh);
     if ($result != FALSE) {
-        if (mysql_num_rows($result) > 0) {
-            $tmpres = mysql_fetch_array($result, MYSQL_ASSOC);
+        if (lime_mysql_num_rows($result) > 0) {
+            $tmpres = lime_mysql_fetch_array($result, LIME_MYSQL_ASSOC);
             // Here we optionally add the AUTO_INCREMENT next value,
             // but starting with MySQL 5.0.24, the clause is already included
             // in SHOW CREATE TABLE so we'll remove it below
@@ -254,15 +254,15 @@ function wple_export_structure($table, $config) {
                 $auto_increment .= ' AUTO_INCREMENT=' . $tmpres['Auto_increment'] . ' ';
             }
         }
-        mysql_free_result($result);
+        lime_mysql_free_result($result);
     }
 
 
     // Table structure
-	$result = mysql_query('SHOW CREATE TABLE `' . $table . '` ', $wpdb->dbh);
+	$result = lime_mysql_query('SHOW CREATE TABLE `' . $table . '` ', $wpdb->dbh);
 
 
-    if ($result != FALSE && ($row = mysql_fetch_array($result, MYSQL_NUM))) {
+    if ($result != FALSE && ($row = lime_mysql_fetch_array($result, LIME_MYSQL_NUM))) {
         $create_query = $row[1];
         unset($row);
 
@@ -283,7 +283,7 @@ function wple_export_structure($table, $config) {
 
 	wple_output_handler($schema_create);
 
-    mysql_free_result($result);
+    lime_mysql_free_result($result);
 }
 
 function wple_export_data($table, $sql_query, $config) {
@@ -291,8 +291,8 @@ function wple_export_data($table, $sql_query, $config) {
 	$i = 0; 
 	$j = 0;
 
-	$result = mysql_query($sql_query, $wpdb->dbh);
-	$fields_cnt = mysql_num_fields($result);
+	$result = lime_mysql_query($sql_query, $wpdb->dbh);
+	$fields_cnt = lime_mysql_num_fields($result);
 	$meta = array();
 	$flags = array();
 
@@ -303,9 +303,9 @@ function wple_export_data($table, $sql_query, $config) {
 	$current_row = 0;
 	$field_set = array();
 
-	while ( $i < @mysql_num_fields( $result ) ) {
-		$meta[$i] = @mysql_fetch_field( $result );
-		$flags[$i] = mysql_field_flags($result, $i);
+	while ( $i < @lime_mysql_num_fields( $result ) ) {
+		$meta[$i] = @lime_mysql_fetch_field( $result );
+		$flags[$i] = lime_mysql_field_flags($result, $i);
 		$field_set[$i] = $meta[$i]->name;
 		$i++;
 	}
@@ -313,18 +313,18 @@ function wple_export_data($table, $sql_query, $config) {
 	$schema_insert = "\n" . wple_export_comment( sprintf(__('Dumping data for table %s', 'lime-export'), $table) ) . "\n";
 	$schema_insert .= "INSERT INTO `" . $table . "` (`" . implode('`, `', $field_set) . "`) VALUES\n";
 
-	while ($row = mysql_fetch_array($result, MYSQL_NUM)) {
+	while ($row = lime_mysql_fetch_array($result, LIME_MYSQL_NUM)) {
 		$values = array();
 		$current_row++;
 
 		for ($j=0; $j < $fields_cnt; $j++) { 
             if (!isset($row[$j]) || is_null($row[$j])) {
                 $values[] = 'NULL';
-            } elseif ($meta[$j]->numeric && $meta[$j]->type != 'timestamp' && ! $meta[$j]->blob) {
+            } elseif (lime_mysql_is_numeric($meta[$j]) && lime_mysql_is_timestamp($meta[$j]) && ! lime_mysql_is_blob($meta[$j]) ) {
 	            // a number
 	            // timestamp is numeric on some MySQL 4.1, BLOBs are sometimes numeric
                 $values[] = $row[$j];
-            } elseif (stristr($flags[$j], 'BINARY') && $meta[$j]->blob && isset($GLOBALS['sql_hex_for_blob'])) {
+            } elseif (lime_mysql_is_binary($flags[$j]) && lime_mysql_is_blob($meta[$j]) && isset($GLOBALS['sql_hex_for_blob'])) {
 	            // a true BLOB
                 if (empty($row[$j]) && $row[$j] != '0') {
                 	// empty blobs need to be different, but '0' is also empty :-(
@@ -332,7 +332,7 @@ function wple_export_data($table, $sql_query, $config) {
                 } else {
                     $values[] = '0x' . bin2hex($row[$j]);
                 }
-            } elseif ($meta[$j]->type == 'bit') {
+            } elseif (lime_mysql_is_bit($meta[$j])) {
             	// detection of 'bit' works only on mysqli extension
                 $values[] = "b'" . wple_addslashes(wple_escape_bit($row[$j], $meta[$j]->length)) . "'";
             } else {
@@ -359,7 +359,7 @@ function wple_export_data($table, $sql_query, $config) {
         wple_output_handler(($current_row == 1 ? '' : ",\n") . $insert_line);
 	}
 
-    mysql_free_result($result);
+    lime_mysql_free_result($result);
 
 	if ($current_row > 0) {
 	    wple_output_handler(";\n");
