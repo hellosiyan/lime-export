@@ -1,7 +1,7 @@
 === Plugin Name ===
-Tags: database, export, snapshot, backup, db, lime
+Tags: database, export, backup, snapshot, db, lime, mysql
 Requires at least: 3.2.1
-Tested up to: 3.6
+Tested up to: 3.9
 Stable tag: trunk
 Contributors: xsisqox
 
@@ -24,6 +24,10 @@ Your data may contain sensitive information, that's why great attention is spent
 2. View snapshots
 
 == Changelog ==
+
+= 1.0 =
+* Significant security improvements
+* Support WP 3.9 and MySQLi
 
 = 0.4 =
 * Improve i18n
