@@ -3,11 +3,11 @@
 global $wpdb;
 
 if ( isset($wpdb->use_mysqli) && $wpdb->use_mysqli ) {
-	define('LIME_MYSQL_ASSOC', MYSQL_ASSOC);
-	define('LIME_MYSQL_NUM', MYSQL_NUM);
-} else {
 	define('LIME_MYSQL_ASSOC', MYSQLI_ASSOC);
 	define('LIME_MYSQL_NUM', MYSQLI_NUM);
+} else {
+	define('LIME_MYSQL_ASSOC', MYSQL_ASSOC);
+	define('LIME_MYSQL_NUM', MYSQL_NUM);
 }
 
 function lime_mysql_fetch_array() {
